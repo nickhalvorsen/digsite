@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using digsite.Hubs;
+using digsite.GameServices.PlayerManager;
 
 namespace digsite
 {
@@ -33,6 +35,11 @@ namespace digsite
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddSignalR();
+
+            services.AddScoped<PlayerManager>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,6 +58,10 @@ namespace digsite
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+
+            app.UseSignalR(routes => {
+                routes.MapHub<DigHub>("/digHub");
+            });
 
             app.UseMvc(routes =>
             {
