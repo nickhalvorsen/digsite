@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using digsite.Models;
+using digsite.Data;
 
 namespace digsite.Controllers
 {
@@ -12,32 +13,33 @@ namespace digsite.Controllers
     {
         public IActionResult Index()
         {
-            return View();
-        }
-
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
+            EnsureTestUserExists();
 
             return View();
         }
 
-        public IActionResult Contact()
+        private void EnsureTestUserExists()
         {
-            ViewData["Message"] = "Your contact page.";
 
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var testUserId = 1001;
+            var context = new DigsiteContext();
+            if (context.Player.Count(p => p.PlayerId == testUserId) == 0)
+            {
+                context.Player.Add(new Player
+                {
+                    PlayerId = 1001,
+                    GameState = new GameState() 
+                    {
+                        IsDigging = 0
+            
+                    },
+                    PlayerState = new PlayerState()
+                    {
+                        Money = 0
+                    }
+                });
+            }
+            context.SaveChanges();
         }
     }
 }
