@@ -1,6 +1,7 @@
 using digsite.GameServices.PlayerManager;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,14 +28,21 @@ namespace digsite.Hubs
             await _playerManager.SendDigState(userId);
         }
 
-        public void StartDigging(int userId)
+        public async Task StartDigging(int userId)
         {
-            _playerManager.StartDigging(userId);
+            await _playerManager.StartDigging(userId);
         }
 
-        public void StopDigging(int userId)
+        public async Task StopDigging(int userId)
         {
-            _playerManager.StopDigging(userId);
+            await _playerManager.StopDigging(userId);
+        }
+
+        public override async Task OnDisconnectedAsync(Exception exception)
+        {
+            // todo this will error if dig state doesnt exist
+            await _playerManager.StopDigging(1001);
+            await base.OnDisconnectedAsync(exception);
         }
     }
 }

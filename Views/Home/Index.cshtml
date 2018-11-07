@@ -1,7 +1,4 @@
 ﻿@page
-<script src="~/lib/signalr/dist/browser/signalr.js"></script>
-<!-- <script src="~/js/dig.js"></script> -->
-<script src="~/js/vue.js"></script>
 
 <div id="app">
     <div v-if="!gameState.isLoaded" class="loading">
@@ -18,8 +15,8 @@
         </div>
 
         <div>
-            digging: {{ playerState.isDigging }}
-            <div v-if="playerState.isDigging">
+            digging: {{ digState.hasDigState && !digState.isPaused }}
+            <div v-if="digState.hasDigState">
                 <div>
 
                 depth: {{ digState.depth }}
@@ -28,90 +25,11 @@
             </div>
         </div>
 
-        <button v-if="!gameState.IsDigging" v-on:click="start">start dig</button>
-        <button v-if="gameState.IsDigging" v-on:click="stop">stop dig</button>
+        <button v-if="!digState.hasDigState || digState.isPaused" v-on:click="start">start dig</button>
+        <button v-if="digState.hasDigState && !digState.isPaused" v-on:click="stop">stop dig</button>
     </div>
 </div>
 
-
-
-<script>
-
-'use strict';
-
-
-
-var app = new Vue({
-  el: '#app',
-  data: {
-      gameState: {
-          isLoaded: false,
-          userId: 1001,
-      },
-      playerState: {
-          money: -1,
-          isDigging: false
-      },
-      digState: {
-          depth: -1,
-          fuel: -1
-      },
-      uiState: {
-          logMessages: ''
-      }
-  },
-  methods: {
-      load: function() {
-          console.log('load')
-          connection.invoke('RequestPlayerState', this.gameState.userId).catch(function(err) {
-              return console.error(err.toString())
-          })
-      },
-      receivePlayerState: function(playerState) {
-          this.playerState.money = playerState.money
-          this.gameState.isLoaded = true
-      },
-    start: function () {
-      console.log('start')
-      connection.invoke('StartDigging', this.gameState.userId).catch(function (err) {
-          return console.error(err.toString())
-      })
-    },
-    stop: function () {
-        console.log('stop')
-
-      connection.invoke('StopDigging', this.gameState.userId).catch(function (err) {
-          return console.error(err.toString())
-      });
-    },
-    addMessage: function(message) {
-        this.uiState.logMessages += '\n'
-        this.uiState.logMessages += message
-
-        var textarea = document.querySelector('.messages')
-        textarea.scrollTop = textarea.scrollHeight
-    }
-  }
-})
-
-
-
-var connection = new signalR.HubConnectionBuilder().withUrl('/digHub').build();
-
-connection.on('Find', function (thing, value) {
-    var message = 'found a ' + thing + ' worth ' + value
-    app.addMessage(thing)
-})
-
-connection.start()
-.catch(function (err) {
-    return console.error(err.toString())
-}).then(function() {
-    app.load()
-})
-
-connection.on('ReceivePlayerState', function(data) {
-    app.receivePlayerState(data)
-})
-
-</script>
+<script src="~/lib/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/vue.js"></script>
+<script src="~/js/vue-app.js"></script>

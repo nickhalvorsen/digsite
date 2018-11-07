@@ -9,6 +9,7 @@ namespace digsite.Data
         public int PlayerId { get; set; }
         public int Depth { get; set; }
         public int Fuel { get; set; }
+        public byte IsPaused { get; set; }
 
         public Player Player { get; set; }
     }

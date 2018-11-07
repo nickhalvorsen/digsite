@@ -45,6 +45,8 @@ namespace digsite.Data
 
                 entity.Property(e => e.Fuel).HasColumnType("int(11)");
 
+                entity.Property(e => e.IsPaused).HasColumnType("tinyint(1)");
+
                 entity.Property(e => e.PlayerId).HasColumnType("int(11)");
 
                 entity.HasOne(d => d.Player)
