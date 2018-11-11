@@ -1,14 +1,30 @@
 ﻿@page
 
+<style>
+    .monsters {
+        border: 1px solid black;
+        padding: 1em;
+        margin: 1em;
+    }
+</style>
+
 <div id="app">
     <div v-if="!gameState.isLoaded" class="loading">
         Loading...
     </div>
     <div v-if="gameState.isLoaded">
-
+        game log:
         <textarea rows="20" cols="50" readonly class="messages">
-        {{ uiState.logMessages }}
+            {{ uiState.logMessages }}
         </textarea>
+
+        <div class="monsters">
+            nearby monsters: 
+            <br>
+            <div v-for="monster in digState.nearbyMonsters">
+                {{ monster.name }} ({{ monster.currentHealth }} / {{ monster.maxHealth }})
+            </div>
+        </div>
 
         <div>
             money: {{ playerState.money }}

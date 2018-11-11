@@ -8,7 +8,7 @@ var app = new Vue({
     data: {
         gameState: {
             isLoaded: false,
-            userId: 1001,
+            playerId: 1001,
         },
         playerState: {
             money: -1,
@@ -17,7 +17,8 @@ var app = new Vue({
             hasDigState: false,
             depth: -1,
             fuel: -1,
-            isPaused: true
+            isPaused: true,
+            nearbyMonsters: { }
         },
         uiState: {
             isAwaitingServerResponse: true,
@@ -27,11 +28,14 @@ var app = new Vue({
     methods: {
         load: function () {
             console.log('load')
-            connection.invoke('RequestPlayerState', this.gameState.userId).catch(function (err) {
+            connection.invoke('RequestPlayerState', this.gameState.playerId).catch(function (err) {
                 return console.error(err.toString())
             })
 
-            connection.invoke('RequestDigState', this.gameState.userId).catch(function (err) {
+            connection.invoke('RequestDigState', this.gameState.playerId).catch(function (err) {
+                return console.error(err.toString())
+            })
+            connection.invoke('RequestNearbyMonsterState', this.gameState.playerId).catch(function (err) {
                 return console.error(err.toString())
             })
         },
@@ -54,10 +58,16 @@ var app = new Vue({
                 this.digState.fuel = digState.fuel
             }
         },
+        receiveNearbyMonsterState: function(nearbyMonsterState) {
+            console.log("nearby monster state: ")
+            console.log(nearbyMonsterState)
+
+            this.digState.nearbyMonsters = nearbyMonsterState
+        },
         start: function () {
             console.log('start')
             this.uiState.isAwaitingServerResponse = true
-            connection.invoke('StartDigging', this.gameState.userId).catch(function (err) {
+            connection.invoke('StartDigging', this.gameState.playerId).catch(function (err) {
                 return console.error(err.toString())
             })
         },
@@ -65,7 +75,7 @@ var app = new Vue({
             this.uiState.isAwaitingServerResponse = true;
             console.log('stop')
 
-            connection.invoke('StopDigging', this.gameState.userId).catch(function (err) {
+            connection.invoke('StopDigging', this.gameState.playerId).catch(function (err) {
                 return console.error(err.toString())
             });
         },
@@ -100,14 +110,16 @@ connection.start()
 
 connection.on('ReceivePlayerState', function (data) {
     app.receivePlayerState(data)
-
     app.$data.uiState.isAwaitingServerResponse = false
 })
 
 
 connection.on('ReceiveDigState', function (data) {
     app.receiveDigState(data)
-
     app.$data.uiState.isAwaitingServerResponse = false
 })
 
+connection.on('ReceiveNearbyMonsterState', function (data) {
+    app.receiveNearbyMonsterState(data)
+    app.$data.uiState.isAwaitingServerResponse = false
+})

@@ -21,7 +21,7 @@ namespace digsite.DataServices
                 return state;
             }
 
-            _context.DigState.Add(new DigState
+            await _context.DigState.AddAsync(new DigState
             {
                 PlayerId = playerId,
                 Depth = 0,

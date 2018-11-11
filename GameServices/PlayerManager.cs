@@ -16,6 +16,8 @@ namespace digsite.GameServices.PlayerManager
         private IHubContext<DigHub> _hubContext;
         private PlayerStateDataService _playerStateDataService;
         private DigStateDataService _digStateDataService;
+        private MonsterDataService _monsterDataService;
+        private NearbyMonsterDataService _nearbyMonsterDataService;
         public static Dictionary<int, Timer> _timers = new Dictionary<int, Timer>();
 
 
@@ -24,6 +26,8 @@ namespace digsite.GameServices.PlayerManager
             _hubContext = hubContext;
             _playerStateDataService = new PlayerStateDataService();
             _digStateDataService = new DigStateDataService();
+            _monsterDataService = new MonsterDataService();
+            _nearbyMonsterDataService = new NearbyMonsterDataService();
         }
 
         public async Task SendPlayerState(int playerId)
@@ -82,7 +86,42 @@ namespace digsite.GameServices.PlayerManager
             await _playerStateDataService.AddMoney(playerId, 1);
             await _hubContext.Clients.All.SendAsync("Find", "table", 1);
             await _digStateDataService.Progress(playerId);
+            if (new Random().Next(1, 10) == 4)
+            {
+                await MonsterApproach(playerId);
+            }
             await SendDigState(playerId);
+            await SendNearbyMonsterState(playerId);
+        }
+
+        private async Task MonsterApproach(int playerId)
+        {
+            var randomMonsterId = new Random().Next(1, 3);
+            var randomMonster = await _monsterDataService.Get(randomMonsterId);
+            await _nearbyMonsterDataService.Add(playerId, randomMonster); 
+        }
+
+        public async Task SendNearbyMonsterState(int playerId)
+        {
+            var nearbyMonsterState = await GetNearbyMonstersDto(playerId);
+            await _hubContext.Clients.All.SendAsync("ReceiveNearbyMonsterState", nearbyMonsterState);
+        }
+
+        private async Task<List<NearbyMonsterDto>> GetNearbyMonstersDto(int playerId)
+        {
+            return (await _nearbyMonsterDataService.Get(playerId))
+                .Select(ConvertToNearbyMonsterDto)
+                .ToList();
+        }
+
+        private NearbyMonsterDto ConvertToNearbyMonsterDto(NearbyMonster nearbyMonster)
+        {
+            return new NearbyMonsterDto
+            {
+                name = nearbyMonster.Monster.Name
+                , maxHealth = nearbyMonster.Monster.Health
+                , currentHealth = nearbyMonster.CurrentHealth
+            };
         }
     }
 }

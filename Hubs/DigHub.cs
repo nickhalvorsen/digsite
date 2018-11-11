@@ -18,24 +18,29 @@ namespace digsite.Hubs
             _playerManager = playerManager;
         }
 
-        public async Task RequestPlayerState(int userId)
+        public async Task RequestPlayerState(int playerId)
         {
-           await _playerManager.SendPlayerState(userId); 
+           await _playerManager.SendPlayerState(playerId); 
         }
 
-        public async Task RequestDigState(int userId)
+        public async Task RequestDigState(int playerId)
         {
-            await _playerManager.SendDigState(userId);
+            await _playerManager.SendDigState(playerId);
         }
 
-        public async Task StartDigging(int userId)
+        public async Task RequestNearbyMonsterState(int playerId)
         {
-            await _playerManager.StartDigging(userId);
+            await _playerManager.SendNearbyMonsterState(playerId);
         }
 
-        public async Task StopDigging(int userId)
+        public async Task StartDigging(int playerId)
         {
-            await _playerManager.StopDigging(userId);
+            await _playerManager.StartDigging(playerId);
+        }
+
+        public async Task StopDigging(int playerId)
+        {
+            await _playerManager.StopDigging(playerId);
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)

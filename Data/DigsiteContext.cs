@@ -17,6 +17,8 @@ namespace digsite.Data
 
         public virtual DbSet<DigState> DigState { get; set; }
         public virtual DbSet<GameState> GameState { get; set; }
+        public virtual DbSet<Monster> Monster { get; set; }
+        public virtual DbSet<NearbyMonster> NearbyMonster { get; set; }
         public virtual DbSet<Player> Player { get; set; }
         public virtual DbSet<PlayerState> PlayerState { get; set; }
 
@@ -73,6 +75,55 @@ namespace digsite.Data
                     .WithOne(p => p.GameState)
                     .HasForeignKey<GameState>(d => d.PlayerId)
                     .HasConstraintName("GameState_ibfk_1");
+            });
+
+            modelBuilder.Entity<Monster>(entity =>
+            {
+                entity.ToTable("Monster", "digsite");
+
+                entity.Property(e => e.MonsterId).HasColumnType("int(11)");
+
+                entity.Property(e => e.Accuracy).HasColumnType("int(11)");
+
+                entity.Property(e => e.Attack).HasColumnType("int(11)");
+
+                entity.Property(e => e.AttackRate).HasColumnType("int(11)");
+
+                entity.Property(e => e.Health).HasColumnType("int(11)");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<NearbyMonster>(entity =>
+            {
+                entity.ToTable("NearbyMonster", "digsite");
+
+                entity.HasIndex(e => e.DigStateId)
+                    .HasName("DigStateId");
+
+                entity.HasIndex(e => e.MonsterId)
+                    .HasName("MonsterId");
+
+                entity.Property(e => e.NearbyMonsterId).HasColumnType("int(11)");
+
+                entity.Property(e => e.CurrentHealth).HasColumnType("int(11)");
+
+                entity.Property(e => e.DigStateId).HasColumnType("int(11)");
+
+                entity.Property(e => e.MonsterId).HasColumnType("int(11)");
+
+                entity.HasOne(d => d.DigState)
+                    .WithMany(p => p.NearbyMonster)
+                    .HasForeignKey(d => d.DigStateId)
+                    .HasConstraintName("NearbyMonster_ibfk_2");
+
+                entity.HasOne(d => d.Monster)
+                    .WithMany(p => p.NearbyMonster)
+                    .HasForeignKey(d => d.MonsterId)
+                    .HasConstraintName("NearbyMonster_ibfk_1");
             });
 
             modelBuilder.Entity<Player>(entity =>
