@@ -1,7 +1,8 @@
 ﻿@page
 
 <style>
-    .monsters {
+    .monsters 
+    , .items{
         border: 1px solid black;
         padding: 1em;
         margin: 1em;
@@ -23,6 +24,14 @@
             <br>
             <div v-for="monster in digState.nearbyMonsters">
                 {{ monster.name }} ({{ monster.currentHealth }} / {{ monster.maxHealth }})
+            </div>
+        </div>
+
+        <div class="items">
+            items:
+            <br>
+            <div v-for="playerItem in playerItems">
+                {{ playerItem.name }}
             </div>
         </div>
 

@@ -33,6 +33,11 @@ namespace digsite.Hubs
             await _playerManager.SendNearbyMonsterState(playerId);
         }
 
+        public async Task RequestItemState(int playerId)
+        {
+            await _playerManager.SendItemState(playerId);
+        }
+
         public async Task StartDigging(int playerId)
         {
             await _playerManager.StartDigging(playerId);

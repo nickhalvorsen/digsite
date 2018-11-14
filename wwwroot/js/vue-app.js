@@ -23,7 +23,8 @@ var app = new Vue({
         uiState: {
             isAwaitingServerResponse: true,
             logMessages: ''
-        }
+        },
+        playerItems : { } 
     },
     methods: {
         load: function () {
@@ -31,11 +32,13 @@ var app = new Vue({
             connection.invoke('RequestPlayerState', this.gameState.playerId).catch(function (err) {
                 return console.error(err.toString())
             })
-
             connection.invoke('RequestDigState', this.gameState.playerId).catch(function (err) {
                 return console.error(err.toString())
             })
             connection.invoke('RequestNearbyMonsterState', this.gameState.playerId).catch(function (err) {
+                return console.error(err.toString())
+            })
+            connection.invoke('RequestItemState', this.gameState.playerId).catch(function (err) {
                 return console.error(err.toString())
             })
         },
@@ -44,6 +47,8 @@ var app = new Vue({
             console.log(playerState)
             this.playerState.money = playerState.money
             this.gameState.isLoaded = true
+            // todo better handling of this
+            this.isAwaitingServerResponse = false
         },
         receiveDigState: function(digState) {
             console.log("dig state: ")
@@ -63,6 +68,11 @@ var app = new Vue({
             console.log(nearbyMonsterState)
 
             this.digState.nearbyMonsters = nearbyMonsterState
+        },
+        receiveItemState: function(itemState) {
+            console.log("playerItems: ")
+            console.log(itemState)
+            this.playerItems = itemState
         },
         start: function () {
             console.log('start')
@@ -110,16 +120,21 @@ connection.start()
 
 connection.on('ReceivePlayerState', function (data) {
     app.receivePlayerState(data)
-    app.$data.uiState.isAwaitingServerResponse = false
 })
 
 
 connection.on('ReceiveDigState', function (data) {
     app.receiveDigState(data)
-    app.$data.uiState.isAwaitingServerResponse = false
 })
 
 connection.on('ReceiveNearbyMonsterState', function (data) {
     app.receiveNearbyMonsterState(data)
-    app.$data.uiState.isAwaitingServerResponse = false
+})
+
+connection.on('ReceiveItemState', function(data) {
+    app.receiveItemState(data);
+})
+
+connection.on('ReceiveGameLogMessage', function(message) {
+    app.addMessage(message);
 })

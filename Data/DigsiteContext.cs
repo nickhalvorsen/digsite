@@ -17,9 +17,12 @@ namespace digsite.Data
 
         public virtual DbSet<DigState> DigState { get; set; }
         public virtual DbSet<GameState> GameState { get; set; }
+        public virtual DbSet<Item> Item { get; set; }
+        public virtual DbSet<ItemCategory> ItemCategory { get; set; }
         public virtual DbSet<Monster> Monster { get; set; }
         public virtual DbSet<NearbyMonster> NearbyMonster { get; set; }
         public virtual DbSet<Player> Player { get; set; }
+        public virtual DbSet<PlayerItem> PlayerItem { get; set; }
         public virtual DbSet<PlayerState> PlayerState { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -75,6 +78,42 @@ namespace digsite.Data
                     .WithOne(p => p.GameState)
                     .HasForeignKey<GameState>(d => d.PlayerId)
                     .HasConstraintName("GameState_ibfk_1");
+            });
+
+            modelBuilder.Entity<Item>(entity =>
+            {
+                entity.ToTable("Item", "digsite");
+
+                entity.HasIndex(e => e.ItemCategoryId)
+                    .HasName("ItemTypeId");
+
+                entity.Property(e => e.ItemId).HasColumnType("int(11)");
+
+                entity.Property(e => e.ItemCategoryId).HasColumnType("int(11)");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.ItemCategory)
+                    .WithMany(p => p.Item)
+                    .HasForeignKey(d => d.ItemCategoryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("Item_ibfk_1");
+            });
+
+            modelBuilder.Entity<ItemCategory>(entity =>
+            {
+                entity.HasKey(e => e.ItemTypeId);
+
+                entity.ToTable("ItemCategory", "digsite");
+
+                entity.Property(e => e.ItemTypeId).HasColumnType("int(11)");
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Monster>(entity =>
@@ -135,6 +174,35 @@ namespace digsite.Data
                 entity.Property(e => e.Email)
                     .HasMaxLength(500)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<PlayerItem>(entity =>
+            {
+                entity.ToTable("PlayerItem", "digsite");
+
+                entity.HasIndex(e => e.ItemId)
+                    .HasName("ItemId");
+
+                entity.HasIndex(e => e.PlayerId)
+                    .HasName("PlayerId");
+
+                entity.Property(e => e.PlayerItemId).HasColumnType("int(11)");
+
+                entity.Property(e => e.ItemId).HasColumnType("int(11)");
+
+                entity.Property(e => e.PlayerId).HasColumnType("int(11)");
+
+                entity.HasOne(d => d.Item)
+                    .WithMany(p => p.PlayerItem)
+                    .HasForeignKey(d => d.ItemId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("PlayerItem_ibfk_2");
+
+                entity.HasOne(d => d.Player)
+                    .WithMany(p => p.PlayerItem)
+                    .HasForeignKey(d => d.PlayerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("PlayerItem_ibfk_1");
             });
 
             modelBuilder.Entity<PlayerState>(entity =>

@@ -18,6 +18,8 @@ namespace digsite.GameServices.PlayerManager
         private DigStateDataService _digStateDataService;
         private MonsterDataService _monsterDataService;
         private NearbyMonsterDataService _nearbyMonsterDataService;
+        private PlayerItemDataService _playerItemDataService;
+        private ItemDataService _itemDataService;
         public static Dictionary<int, Timer> _timers = new Dictionary<int, Timer>();
 
 
@@ -28,6 +30,8 @@ namespace digsite.GameServices.PlayerManager
             _digStateDataService = new DigStateDataService();
             _monsterDataService = new MonsterDataService();
             _nearbyMonsterDataService = new NearbyMonsterDataService();
+            _playerItemDataService = new PlayerItemDataService();
+            _itemDataService = new ItemDataService();
         }
 
         public async Task SendPlayerState(int playerId)
@@ -90,8 +94,13 @@ namespace digsite.GameServices.PlayerManager
             {
                 await MonsterApproach(playerId);
             }
+            if (new Random().Next(90, 99) > 90)
+            {
+                await GiveRandomItem(playerId);
+            }
             await SendDigState(playerId);
             await SendNearbyMonsterState(playerId);
+            await SendItemState(playerId);
         }
 
         private async Task MonsterApproach(int playerId)
@@ -99,6 +108,14 @@ namespace digsite.GameServices.PlayerManager
             var randomMonsterId = new Random().Next(1, 3);
             var randomMonster = await _monsterDataService.Get(randomMonsterId);
             await _nearbyMonsterDataService.Add(playerId, randomMonster); 
+        }
+
+        private async Task GiveRandomItem(int playerId)
+        {
+            var itemId = new Random().Next(1, 7);
+            await _playerItemDataService.Give(playerId, itemId);
+            var item = _itemDataService.Get(itemId);
+            await SendGameLogMessage(playerId, "You found a " + item.Name);
         }
 
         public async Task SendNearbyMonsterState(int playerId)
@@ -122,6 +139,32 @@ namespace digsite.GameServices.PlayerManager
                 , maxHealth = nearbyMonster.Monster.Health
                 , currentHealth = nearbyMonster.CurrentHealth
             };
+        }
+
+        public async Task SendItemState(int playerId)
+        {
+            var items = await GetItemStateDto(playerId);
+            await _hubContext.Clients.All.SendAsync("ReceiveItemState", items);
+        }
+
+        private async Task<List<PlayerItemDto>> GetItemStateDto(int playerId)
+        {
+            var items = await _playerItemDataService.Get(playerId);
+            return items.Select(ConvertToPlayerItemDto).ToList();
+        }
+
+        private PlayerItemDto ConvertToPlayerItemDto(PlayerItem playerItem)
+        {
+            return new PlayerItemDto
+            {
+                name = playerItem.Item.Name
+                , itemCategoryId = playerItem.Item.ItemCategoryId
+            };
+        }
+
+        private async Task SendGameLogMessage(int playerId, string message)
+        {
+            await _hubContext.Clients.All.SendAsync("ReceiveGameLogMessage", message);
         }
     }
 }
