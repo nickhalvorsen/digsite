@@ -8,5 +8,7 @@ namespace digsite.DataServices
     {
         public string name;
         public int itemCategoryId;
+        public bool isEquipped; 
+        public int itemSlotId;
     }
 }

@@ -29,9 +29,9 @@ namespace digsite.DataServices
                 IsPaused = (byte)1
             });
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            return await Get(playerId);
+                return await Get(playerId);
         }
 
         public async Task<DigState> Get(int playerId)
@@ -46,14 +46,14 @@ namespace digsite.DataServices
             state.Depth++;
             state.Fuel--;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         public async Task<DigState> SetPaused(bool isPaused, int playerId)
         {
             var state = await Get(playerId);
             state.IsPaused = isPaused ? (byte)1 : (byte)0;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return state;
         }
     }

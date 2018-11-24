@@ -8,12 +8,16 @@ namespace digsite.DataServices
 {
     public class ItemDataService
     {
-        public Item Get(int itemId)
+        private readonly DigsiteContext _context;
+
+        public ItemDataService()
         {
-            using (var context = new DigsiteContext())
-            {
-                return context.Item.Find(itemId);
-            }
+            _context = new DigsiteContext();
+        }
+
+        public async Task<Item> Get(int itemId)
+        {
+            return await _context.Item.FindAsync(itemId);
         }
     }
 }

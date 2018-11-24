@@ -6,7 +6,7 @@ namespace digsite.DataServices
 {
     public class MonsterDataService
     {
-        private DigsiteContext _context;
+        private readonly DigsiteContext _context;
 
         public MonsterDataService()
         {

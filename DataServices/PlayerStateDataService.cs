@@ -7,8 +7,8 @@ namespace digsite.DataServices
 {
     public class PlayerStateDataService
     {
-        private DigsiteContext _context;
-
+        private readonly DigsiteContext _context;
+        
         public PlayerStateDataService()
         {
             _context = new DigsiteContext();
@@ -16,7 +16,7 @@ namespace digsite.DataServices
 
         public async Task<PlayerState> GetPlayerState(int playerId)
         {
-           return await _context.PlayerState.FirstOrDefaultAsync(p => p.PlayerId == playerId);
+            return await _context.PlayerState.FirstOrDefaultAsync(p => p.PlayerId == playerId);
         }
 
         public async Task AddMoney(int playerId, int amount)

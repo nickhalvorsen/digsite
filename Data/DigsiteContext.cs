@@ -19,6 +19,7 @@ namespace digsite.Data
         public virtual DbSet<GameState> GameState { get; set; }
         public virtual DbSet<Item> Item { get; set; }
         public virtual DbSet<ItemCategory> ItemCategory { get; set; }
+        public virtual DbSet<ItemSlot> ItemSlot { get; set; }
         public virtual DbSet<Monster> Monster { get; set; }
         public virtual DbSet<NearbyMonster> NearbyMonster { get; set; }
         public virtual DbSet<Player> Player { get; set; }
@@ -87,9 +88,16 @@ namespace digsite.Data
                 entity.HasIndex(e => e.ItemCategoryId)
                     .HasName("ItemTypeId");
 
+                entity.HasIndex(e => e.ItemSlotId)
+                    .HasName("ItemSlotId");
+
                 entity.Property(e => e.ItemId).HasColumnType("int(11)");
 
                 entity.Property(e => e.ItemCategoryId).HasColumnType("int(11)");
+
+                entity.Property(e => e.ItemSlotId)
+                    .HasColumnType("int(11)")
+                    .HasDefaultValueSql("1");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -101,6 +109,12 @@ namespace digsite.Data
                     .HasForeignKey(d => d.ItemCategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Item_ibfk_1");
+
+                entity.HasOne(d => d.ItemSlot)
+                    .WithMany(p => p.Item)
+                    .HasForeignKey(d => d.ItemSlotId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("Item_ibfk_2");
             });
 
             modelBuilder.Entity<ItemCategory>(entity =>
@@ -112,6 +126,18 @@ namespace digsite.Data
                 entity.Property(e => e.ItemTypeId).HasColumnType("int(11)");
 
                 entity.Property(e => e.Name)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<ItemSlot>(entity =>
+            {
+                entity.ToTable("ItemSlot", "digsite");
+
+                entity.Property(e => e.ItemSlotId).HasColumnType("int(11)");
+
+                entity.Property(e => e.Description)
+                    .IsRequired()
                     .HasMaxLength(100)
                     .IsUnicode(false);
             });
@@ -187,6 +213,10 @@ namespace digsite.Data
                     .HasName("PlayerId");
 
                 entity.Property(e => e.PlayerItemId).HasColumnType("int(11)");
+
+                entity.Property(e => e.IsEquipped)
+                    .HasColumnType("tinyint(1)")
+                    .HasDefaultValueSql("0");
 
                 entity.Property(e => e.ItemId).HasColumnType("int(11)");
 

@@ -13,8 +13,10 @@ namespace digsite.Data
         public int ItemId { get; set; }
         public int ItemCategoryId { get; set; }
         public string Name { get; set; }
+        public int ItemSlotId { get; set; }
 
         public ItemCategory ItemCategory { get; set; }
+        public ItemSlot ItemSlot { get; set; }
         public ICollection<PlayerItem> PlayerItem { get; set; }
     }
 }

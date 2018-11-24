@@ -8,6 +8,7 @@ namespace digsite.Data
         public int PlayerItemId { get; set; }
         public int PlayerId { get; set; }
         public int ItemId { get; set; }
+        public byte IsEquipped { get; set; }
 
         public Item Item { get; set; }
         public Player Player { get; set; }

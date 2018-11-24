@@ -8,8 +8,8 @@ namespace digsite.DataServices
 {
     public class NearbyMonsterDataService
     {
-        private DigStateDataService _digStateDataService;
-        private DigsiteContext _context;
+        private readonly DigsiteContext _context;
+        private readonly DigStateDataService _digStateDataService;
 
         public NearbyMonsterDataService()
         {
@@ -41,6 +41,7 @@ namespace digsite.DataServices
                 .Include(ds => ds.NearbyMonster)
                 .ThenInclude(nm => nm.Monster)
                 .FirstOrDefaultAsync(ds => ds.PlayerId == playerId);
+
             return digState.NearbyMonster.ToList();
         }
     }

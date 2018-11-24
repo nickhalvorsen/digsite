@@ -18,98 +18,70 @@ var app = new Vue({
             depth: -1,
             fuel: -1,
             isPaused: true,
-            nearbyMonsters: { }
+            nearbyMonsterState: { }
         },
         uiState: {
             isAwaitingServerResponse: true,
             logMessages: ''
         },
-        playerItems : { } 
+        itemState : { } 
     },
     methods: {
         load: function () {
-            console.log('load')
-            connection.invoke('RequestPlayerState', this.gameState.playerId).catch(function (err) {
-                return console.error(err.toString())
-            })
-            connection.invoke('RequestDigState', this.gameState.playerId).catch(function (err) {
-                return console.error(err.toString())
-            })
-            connection.invoke('RequestNearbyMonsterState', this.gameState.playerId).catch(function (err) {
-                return console.error(err.toString())
-            })
-            connection.invoke('RequestItemState', this.gameState.playerId).catch(function (err) {
-                return console.error(err.toString())
-            })
-        },
-        receivePlayerState: function (playerState) {
-            console.log("player state:")
-            console.log(playerState)
-            this.playerState.money = playerState.money
-            this.gameState.isLoaded = true
-            // todo better handling of this
-            this.isAwaitingServerResponse = false
-        },
-        receiveDigState: function(digState) {
-            console.log("dig state: ")
-            console.log(digState)
-            if (digState === null) {
-                this.digState.hasDigState = false
-            }
-            else {
-                this.digState.hasDigState = true
-                this.digState.depth = digState.depth
-                this.digState.isPaused = digState.isPaused
-                this.digState.fuel = digState.fuel
-            }
-        },
-        receiveNearbyMonsterState: function(nearbyMonsterState) {
-            console.log("nearby monster state: ")
-            console.log(nearbyMonsterState)
+            console.log('loading data from server...')
 
-            this.digState.nearbyMonsters = nearbyMonsterState
+            connection.invoke('GameLoadData', this.gameState.playerId).catch(function (err) {
+                return console.error(err.toString())
+            })
         },
-        receiveItemState: function(itemState) {
-            console.log("playerItems: ")
-            console.log(itemState)
-            this.playerItems = itemState
+        updateGameData: function(payload) {
+            this.gameState.isLoaded = true
+            if (payload.playerState !== null) {
+                console.log("player state: ")
+                console.log(payload.playerState)
+                this.playerState = payload.playerState
+            }
+            if (payload.digState !== null) {
+                console.log("dig state: ")
+                console.log(payload.digState)
+                this.digState = payload.digState
+            }
+            if (payload.itemState !== null) {
+                console.log("item state: ")
+                console.log(payload.itemState)
+                this.itemState = payload.itemState
+            }
         },
-        start: function () {
+        startDigging: function () {
             console.log('start')
-            this.uiState.isAwaitingServerResponse = true
             connection.invoke('StartDigging', this.gameState.playerId).catch(function (err) {
                 return console.error(err.toString())
             })
         },
-        stop: function () {
-            this.uiState.isAwaitingServerResponse = true;
+        stopDigging: function () {
             console.log('stop')
 
             connection.invoke('StopDigging', this.gameState.playerId).catch(function (err) {
                 return console.error(err.toString())
             });
         },
-        foundItem: function(thing, value) {
-            this.playerState.money += value;
-            this.addMessage("you found a " + thing)
-        },
         addMessage: function (message) {
-            this.uiState.logMessages += '\n'
-            this.uiState.logMessages += message
+            this.uiState.logMessages += '\n' + message
 
             var textarea = document.querySelector('.messages')
             textarea.scrollTop = textarea.scrollHeight
+        },
+        equipItem: function(item) {
+            console.log(item)
+        },
+        unequipItem: function() {
+
         }
     }
 })
 
 
-
 var connection = new signalR.HubConnectionBuilder().withUrl('/digHub').build();
-
-connection.on('Find', function (thing, value) {
-    app.foundItem(thing, value)
-})
 
 connection.start()
     .catch(function (err) {
@@ -118,21 +90,8 @@ connection.start()
         app.load()
     })
 
-connection.on('ReceivePlayerState', function (data) {
-    app.receivePlayerState(data)
-})
-
-
-connection.on('ReceiveDigState', function (data) {
-    app.receiveDigState(data)
-})
-
-connection.on('ReceiveNearbyMonsterState', function (data) {
-    app.receiveNearbyMonsterState(data)
-})
-
-connection.on('ReceiveItemState', function(data) {
-    app.receiveItemState(data);
+connection.on('ReceiveGameUpdate', function(payload) {
+    app.updateGameData(payload);
 })
 
 connection.on('ReceiveGameLogMessage', function(message) {

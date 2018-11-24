@@ -18,24 +18,9 @@ namespace digsite.Hubs
             _playerManager = playerManager;
         }
 
-        public async Task RequestPlayerState(int playerId)
+        public async Task GameLoadData(int playerId)
         {
-           await _playerManager.SendPlayerState(playerId); 
-        }
-
-        public async Task RequestDigState(int playerId)
-        {
-            await _playerManager.SendDigState(playerId);
-        }
-
-        public async Task RequestNearbyMonsterState(int playerId)
-        {
-            await _playerManager.SendNearbyMonsterState(playerId);
-        }
-
-        public async Task RequestItemState(int playerId)
-        {
-            await _playerManager.SendItemState(playerId);
+            await _playerManager.GameUpdateData(playerId);
         }
 
         public async Task StartDigging(int playerId)
@@ -46,6 +31,16 @@ namespace digsite.Hubs
         public async Task StopDigging(int playerId)
         {
             await _playerManager.StopDigging(playerId);
+        }
+
+        public async Task EquipItem(int playerId, int equippedPlayerItemId, int? unEquippedPlayerItemId)
+        {
+            if (unEquippedPlayerItemId != null && unEquippedPlayerItemId > 0)
+            {
+                await _playerManager.UnequipItem(playerId, unEquippedPlayerItemId.Value);
+            }
+
+            await _playerManager.EquipItem(playerId, equippedPlayerItemId);
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
