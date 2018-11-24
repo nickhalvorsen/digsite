@@ -33,14 +33,19 @@ namespace digsite.Hubs
             await _playerManager.StopDigging(playerId);
         }
 
-        public async Task EquipItem(int playerId, int equippedPlayerItemId, int? unEquippedPlayerItemId)
+        public async Task EquipItem(int playerId, int? equippedPlayerItemId, int? unEquippedPlayerItemId)
         {
             if (unEquippedPlayerItemId != null && unEquippedPlayerItemId > 0)
             {
                 await _playerManager.UnequipItem(playerId, unEquippedPlayerItemId.Value);
             }
 
-            await _playerManager.EquipItem(playerId, equippedPlayerItemId);
+            if (equippedPlayerItemId != null && equippedPlayerItemId > 0)
+            {
+                await _playerManager.EquipItem(playerId, equippedPlayerItemId.Value);
+            }
+
+            await _playerManager.GameUpdateData(playerId);
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)

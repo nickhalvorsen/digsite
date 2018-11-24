@@ -13,10 +13,16 @@
         width: 400px;
     }
 
-    .item:hover {
+    .item.equippable:hover {
         color: white;
         background: black;
     }
+
+    .itemPendingServerUpdate { 
+        color: #666;
+        background: #eee;
+    }
+
 </style>
 
 <div id="app">
@@ -63,13 +69,30 @@
                 <br>
                 equipped:
                 <hr/>
-                <div v-for="playerItem in itemState" v-if="playerItem.isEquipped" v-on:click="unequipItem" class="item">
-                    {{ playerItem.name }}
+                <div v-for="playerItem in itemState" v-if="playerItem.isEquipped">
+                    <div v-if="playerItem.isPendingServerUpdate" class="item itemPendingServerUpdate">
+                        {{ playerItem.name }}
+                    </div>
+                    <div v-if="!playerItem.IsPendingServerUpdate && playerItem.itemSlotId <= 1" class="item">
+                        {{ playerItem.name }}
+                    </div>
+                    <div v-if="!playerItem.isPendingServerUpdate && playerItem.itemSlotId > 1" v-on:click="unequipItem(playerItem.playerItemId)" class="item equippable">
+                        {{ playerItem.name }}
+                    </div>
                 </div>
                 <hr/>
 
-                <div v-for="playerItem in itemState" v-if="!playerItem.isEquipped" v-on:click="equipItem" class="item">
-                    {{ playerItem.name }}
+                <div v-for="playerItem in itemState" v-if="!playerItem.isEquipped">
+                    <div v-if="playerItem.isPendingServerUpdate" class="item itemPendingServerUpdate">
+                        {{ playerItem.name }}
+                    </div>
+
+                    <div v-if="!playerItem.IsPendingServerUpdate && playerItem.itemSlotId <= 1" class="item">
+                        {{ playerItem.name }}
+                    </div>
+                    <div v-if="!playerItem.isPendingServerUpdate && playerItem.itemSlotId > 1" v-on:click="equipItem(playerItem.playerItemId)" class="item equippable">
+                        {{ playerItem.name }}
+                    </div>
                 </div>
             </div>
         </div>

@@ -32,7 +32,7 @@ namespace digsite.DataServices
                 , CurrentHealth = monster.Health
             });
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         public async Task<List<NearbyMonster>> Get(int playerId)

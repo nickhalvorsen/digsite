@@ -71,11 +71,46 @@ var app = new Vue({
             var textarea = document.querySelector('.messages')
             textarea.scrollTop = textarea.scrollHeight
         },
-        equipItem: function(item) {
-            console.log(item)
-        },
-        unequipItem: function() {
+        equipItem: function(equippedPlayerItemId) {
+            console.log("equip")
+            console.log(equippedPlayerItemId)
+            var unequippedPlayerItemId = this.getUnequipItemId(equippedPlayerItemId)
 
+            connection.invoke('equipItem', this.gameState.playerId, equippedPlayerItemId, unequippedPlayerItemId).catch(function (err) {
+                return console.error(err.toString())
+            });
+        },
+        getUnequipItemId(playerItemId) {
+            var thisPlayerItemSlot = null
+            for (var i = 0; i < this.itemState.length; i++) {
+                if (this.itemState[i].playerItemId === playerItemId) {
+                    thisPlayerItemSlot = this.itemState[i].itemSlotId
+                }
+            }
+
+            console.log("thisplayeritemslot:")
+            console.log(thisPlayerItemSlot)
+
+            if (thisPlayerItemSlot === null) {
+                return null
+            }
+
+            for (var i = 0; i < this.itemState.length; i++) {
+                console.log("checking:")
+                console.log(this.itemState[i].playerItemId)
+                console.log(this.itemState[i].itemSlotId)
+                if (this.itemState[i].itemSlotId === thisPlayerItemSlot && this.itemState[i].isEquipped && playerItemId !== this.itemState[i].playerItemId) {
+                    console.log("yep")
+                    return this.itemState[i].playerItemId
+                }
+            }
+
+            return null
+        },
+        unequipItem: function(unequippedPlayerItemId) {
+            connection.invoke('equipItem', this.gameState.playerId, null, unequippedPlayerItemId).catch(function (err) {
+                return console.error(err.toString())
+            });
         }
     }
 })

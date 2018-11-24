@@ -107,7 +107,8 @@ namespace digsite.GameServices.PlayerManager
         {
             return new PlayerItemDto
             {
-                name = playerItem.Item.Name
+                playerItemId = playerItem.PlayerItemId
+                , name = playerItem.Item.Name
                 , itemCategoryId = playerItem.Item.ItemCategoryId
                 , isEquipped = playerItem.IsEquipped != 0
                 , itemSlotId = playerItem.Item.ItemSlotId

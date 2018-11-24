@@ -41,19 +41,21 @@ namespace digsite.DataServices
 
             await _context.PlayerItem.AddAsync(playerItem);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         public async Task Equip(int playerItemId)
         {
             var item = await _context.PlayerItem.FindAsync(playerItemId);
             item.IsEquipped = (byte)1;
+            await _context.SaveChangesAsync();
         }
 
         public async Task Unequip(int playerItemId)
         {
             var item = await _context.PlayerItem.FindAsync(playerItemId);
             item.IsEquipped = (byte)0;
+            await _context.SaveChangesAsync();
         }
     }
 }
