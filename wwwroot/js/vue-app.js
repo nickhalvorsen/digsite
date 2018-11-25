@@ -44,7 +44,7 @@ var app = new Vue({
             if (payload.digState !== null) {
                 console.log("dig state: ")
                 console.log(payload.digState)
-                this.digState = payload.digState
+                this.digState = payload.digState;
             }
             if (payload.itemState !== null) {
                 console.log("item state: ")
@@ -109,6 +109,11 @@ var app = new Vue({
         },
         unequipItem: function(unequippedPlayerItemId) {
             connection.invoke('equipItem', this.gameState.playerId, null, unequippedPlayerItemId).catch(function (err) {
+                return console.error(err.toString())
+            });
+        },
+        returnToSurface: function() {
+            connection.invoke('returnToSurface', this.gameState.playerId).catch(function (err) {
                 return console.error(err.toString())
             });
         }

@@ -8,54 +8,62 @@ namespace digsite.DataServices
 {
     public class PlayerItemDataService
     {
-        private readonly DigsiteContext _context;
-
-        public PlayerItemDataService()
-        {
-            _context = new DigsiteContext();
-        }
 
         public async Task<PlayerItem> Get(int playerItemId)
         {
-            return await _context.PlayerItem
-                .Include(pi => pi.Item)
-                .Where(pi => pi.PlayerItemId == playerItemId)
-                .FirstOrDefaultAsync();
+            using (var context = new DigsiteContext())
+            {
+                return await context.PlayerItem
+                    .Include(pi => pi.Item)
+                    .Where(pi => pi.PlayerItemId == playerItemId)
+                    .FirstOrDefaultAsync();
+            }
         }
 
         public async Task<List<PlayerItem>> GetPlayer(int playerId)
         {
-            return await _context.PlayerItem
-                .Include(pi => pi.Item)
-                .Where(pi => pi.PlayerId == playerId)
-                .ToListAsync();
+            using (var context = new DigsiteContext())
+            {
+                return await context.PlayerItem
+                    .Include(pi => pi.Item)
+                    .Where(pi => pi.PlayerId == playerId)
+                    .ToListAsync();
+            }
         }
 
         public async Task Give(int playerId, int itemId)
         {
-            var playerItem = new PlayerItem
+            using (var context = new DigsiteContext())
             {
-                PlayerId = playerId
-                , ItemId = itemId
-            };
+                var playerItem = new PlayerItem
+                {
+                    PlayerId = playerId
+                    , ItemId = itemId
+                };
 
-            await _context.PlayerItem.AddAsync(playerItem);
-
-            await _context.SaveChangesAsync();
+                await context.PlayerItem.AddAsync(playerItem);
+                await context.SaveChangesAsync();
+            }
         }
 
         public async Task Equip(int playerItemId)
         {
-            var item = await _context.PlayerItem.FindAsync(playerItemId);
-            item.IsEquipped = (byte)1;
-            await _context.SaveChangesAsync();
+            using (var context = new DigsiteContext())
+            {
+                var item = await context.PlayerItem.FindAsync(playerItemId);
+                item.IsEquipped = (byte)1;
+                await context.SaveChangesAsync();
+            }
         }
 
         public async Task Unequip(int playerItemId)
         {
-            var item = await _context.PlayerItem.FindAsync(playerItemId);
-            item.IsEquipped = (byte)0;
-            await _context.SaveChangesAsync();
+            using (var context = new DigsiteContext())
+            {
+                var item = await context.PlayerItem.FindAsync(playerItemId);
+                item.IsEquipped = (byte)0;
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

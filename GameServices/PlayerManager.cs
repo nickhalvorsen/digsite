@@ -36,6 +36,7 @@ namespace digsite.GameServices.PlayerManager
         {
             await GameUpdateData(playerId, new List<string>());
         }
+
         public async Task GameUpdateData(int playerId, List<string> messages)
         {
             var playerState = await _playerStateDataService.GetPlayerState(playerId);
@@ -125,9 +126,8 @@ namespace digsite.GameServices.PlayerManager
 
         public async Task StopDigging(int playerId)
         {
-            var state = await _digStateDataService.SetPaused(true, playerId);
-            _digTimerService.Stop(playerId);
             await _digStateDataService.SetPaused(true, playerId);
+            _digTimerService.Stop(playerId);
             await GameUpdateData(playerId);
         }
 
@@ -144,6 +144,14 @@ namespace digsite.GameServices.PlayerManager
         public async Task EquipItem(int playerId, int playerItemId)
         {
             await _playerItemService.Equip(playerId, playerItemId);
+        }
+
+        public async Task ReturnToSurface(int playerId) 
+        {
+            _digTimerService.Stop(playerId);
+            await _digStateDataService.Clear(playerId);
+            var message = new List<string> { "you return to the surface." };
+            await GameUpdateData(playerId, message);
         }
     }
 }

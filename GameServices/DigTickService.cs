@@ -39,7 +39,7 @@ namespace digsite.GameServices
                 messages.Add(msg);
             }
             
-            messages.Add("tick");
+            messages.Add("you dig a little deeper.");
 
             return messages;
         }

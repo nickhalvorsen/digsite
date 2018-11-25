@@ -8,12 +8,10 @@ namespace digsite.DataServices
 {
     public class NearbyMonsterDataService
     {
-        private readonly DigsiteContext _context;
         private readonly DigStateDataService _digStateDataService;
 
         public NearbyMonsterDataService()
         {
-            _context = new DigsiteContext();
             _digStateDataService = new DigStateDataService();
         }
 
@@ -25,24 +23,44 @@ namespace digsite.DataServices
                 return;
             }
 
-            await _context.NearbyMonster.AddAsync(new NearbyMonster 
+            using (var context = new DigsiteContext())
             {
-                DigStateId = digState.DigStateId
-                , MonsterId = monster.MonsterId
-                , CurrentHealth = monster.Health
-            });
+                await context.NearbyMonster.AddAsync(new NearbyMonster 
+                {
+                    DigStateId = digState.DigStateId
+                    , MonsterId = monster.MonsterId
+                    , CurrentHealth = monster.Health
+                });
 
-            await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
+            }
         }
 
         public async Task<List<NearbyMonster>> Get(int playerId)
         {
-            var digState = await _context.DigState
-                .Include(ds => ds.NearbyMonster)
-                .ThenInclude(nm => nm.Monster)
-                .FirstOrDefaultAsync(ds => ds.PlayerId == playerId);
+            using (var context = new DigsiteContext())
+            {
+                var digState = await context.DigState
+                    .Include(ds => ds.NearbyMonster)
+                    .ThenInclude(nm => nm.Monster)
+                    .FirstOrDefaultAsync(ds => ds.PlayerId == playerId);
 
-            return digState.NearbyMonster.ToList();
+                return digState.NearbyMonster.ToList();
+            }
+        }
+
+        public async Task Clear(int playerId)
+        {
+            using (var context = new DigsiteContext())
+            {
+                var digState = await context
+                .DigState
+                .SingleAsync(ds => ds.PlayerId == playerId);
+
+                digState.NearbyMonster.Clear();
+
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

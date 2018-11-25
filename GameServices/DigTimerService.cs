@@ -53,6 +53,7 @@ namespace digsite.GameServices
         {
             if (_timers.ContainsKey(playerId))
             {
+                _timers[playerId].Timer.Enabled = false;
                 _timers[playerId].Timer.Dispose();
             }
         }

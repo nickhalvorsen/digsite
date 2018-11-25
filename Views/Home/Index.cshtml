@@ -10,6 +10,7 @@
 
     .panel3 {
         display:inline-block;
+        float:left;
         width: 400px;
     }
 
@@ -53,6 +54,7 @@
 
             <button v-if="!digState.hasDigState || digState.isPaused" v-on:click="startDigging">start dig</button>
             <button v-if="digState.hasDigState && !digState.isPaused" v-on:click="stopDigging">stop dig</button>
+            <button v-if="digState.hasDigState" v-on:click="returnToSurface">return to surface</button>
         </div>
         <div class="panel3">
             <div class="monsters">

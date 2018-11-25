@@ -54,5 +54,10 @@ namespace digsite.Hubs
             await _playerManager.StopDigging(1001);
             await base.OnDisconnectedAsync(exception);
         }
+
+        public async Task ReturnToSurface(int playerId) 
+        {
+            await _playerManager.ReturnToSurface(playerId);
+        }
     }
 }
