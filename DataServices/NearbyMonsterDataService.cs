@@ -9,10 +9,12 @@ namespace digsite.DataServices
     public class NearbyMonsterDataService
     {
         private readonly DigStateDataService _digStateDataService;
+        private readonly MonsterDataService _monsterDataService;
 
         public NearbyMonsterDataService()
         {
             _digStateDataService = new DigStateDataService();
+            _monsterDataService = new MonsterDataService();
         }
 
         public async Task Add(int playerId, Monster monster)
@@ -30,6 +32,7 @@ namespace digsite.DataServices
                     DigStateId = digState.DigStateId
                     , MonsterId = monster.MonsterId
                     , CurrentHealth = monster.Health
+                    , CurrentAttackCooldown = 2
                 });
 
                 await context.SaveChangesAsync();
@@ -58,6 +61,38 @@ namespace digsite.DataServices
                 .SingleAsync(ds => ds.PlayerId == playerId);
 
                 digState.NearbyMonster.Clear();
+
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task CooldownTick(int digStateId)
+        {
+            using (var context = new DigsiteContext())
+            {
+                var monsters = context.NearbyMonster.Where(nm => nm.DigStateId == digStateId);
+                foreach (var monster in monsters)
+                {
+                    monster.CurrentAttackCooldown--;
+                }
+
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task CooldownReset(int digStateId)
+        {
+            using (var context = new DigsiteContext())
+            {
+                var monsters = context.NearbyMonster.Where(nm => nm.DigStateId == digStateId);
+                foreach (var monster in monsters)
+                {
+                    if (monster.CurrentAttackCooldown < 0)
+                    {
+                        var baseMonster = await _monsterDataService.Get(monster.MonsterId);
+                        monster.CurrentAttackCooldown = baseMonster.AttackRate;
+                    }
+                }
 
                 await context.SaveChangesAsync();
             }

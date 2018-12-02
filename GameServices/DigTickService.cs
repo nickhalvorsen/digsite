@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using digsite.DataServices;
@@ -38,6 +39,9 @@ namespace digsite.GameServices
                 var msg = await GiveRandomItem(playerId);
                 messages.Add(msg);
             }
+
+            var monsterMessages = await HandleMonsterAttacks(playerId);
+            messages.AddRange(monsterMessages);
             
             messages.Add("you dig a little deeper.");
 
@@ -58,6 +62,28 @@ namespace digsite.GameServices
             await _playerItemDataService.Give(playerId, itemId);
             var item = await _itemDataService.Get(itemId);
             return $"You found a {item.Name}.";
+        }
+
+        private async Task<List<string>> HandleMonsterAttacks(int playerId)
+        {
+            var digState = await _digStateDataService.Get(playerId);
+            await _nearbyMonsterDataService.CooldownTick(digState.DigStateId);
+            var monsters = await _nearbyMonsterDataService.Get(playerId);
+            var attackers = monsters.Where(m => m.CurrentAttackCooldown < 0);
+
+
+            var messages = new List<string>();
+            foreach (var attacker in attackers) 
+            {
+                var damage = new Random().Next(1, attacker.Monster.Attack);
+                var message = $"{attacker.Monster.Name} hits for {damage}.";
+                messages.Add(message);
+                await _digStateDataService.TakeDamage(playerId, damage);
+            }
+
+            await _nearbyMonsterDataService.CooldownReset(digState.DigStateId);
+
+            return messages;
         }
     }
 }

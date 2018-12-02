@@ -174,6 +174,10 @@ namespace digsite.Data
 
                 entity.Property(e => e.NearbyMonsterId).HasColumnType("int(11)");
 
+                entity.Property(e => e.CurrentAttackCooldown)
+                    .HasColumnType("int(11)")
+                    .HasDefaultValueSql("0");
+
                 entity.Property(e => e.CurrentHealth).HasColumnType("int(11)");
 
                 entity.Property(e => e.DigStateId).HasColumnType("int(11)");
@@ -213,6 +217,10 @@ namespace digsite.Data
                     .HasName("PlayerId");
 
                 entity.Property(e => e.PlayerItemId).HasColumnType("int(11)");
+
+                entity.Property(e => e.CurrentCooldown)
+                    .HasColumnType("int(11)")
+                    .HasDefaultValueSql("0");
 
                 entity.Property(e => e.IsEquipped)
                     .HasColumnType("tinyint(1)")

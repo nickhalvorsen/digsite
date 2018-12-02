@@ -71,5 +71,15 @@ namespace digsite.DataServices
                 await context.SaveChangesAsync();
             }
         }
+
+        public async Task TakeDamage(int playerId, int damage)
+        {
+            using (var context = new DigsiteContext())
+            {
+                var state = await context.DigState.FirstOrDefaultAsync(d => d.PlayerId == playerId);
+                state.Fuel -= damage;
+                await context.SaveChangesAsync();
+            }
+        }
     }
 }
