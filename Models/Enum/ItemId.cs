@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using digsite.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace digsite.DataServices
+namespace digsite.Models
 {
     public enum ItemId
     {

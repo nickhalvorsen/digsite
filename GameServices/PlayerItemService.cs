@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using digsite.Data;
 using digsite.DataServices;
+using digsite.Models;
 
 namespace digsite.GameServices
 {
@@ -40,6 +42,40 @@ namespace digsite.GameServices
             var playerItems = await _playerItemDataService.GetPlayer(playerItem.PlayerId);
 
             return playerItems.Any(pi => pi.Item.ItemSlotId == itemSlotId);
+        }
+
+        public async Task<List<string>> ActivateItems(int playerId)
+        {
+
+            var results = new List<string>();
+            
+            var itemsToActivate = await _playerItemDataService.GetItemsToActivate(playerId);
+            foreach (var item in itemsToActivate)
+            {
+                var message = await ActivateItem(item);
+                results.Add(message);
+            }
+            await _playerItemDataService.CooldownTick(playerId);
+
+            return results;
+        }
+
+        private async Task<string> ActivateItem(PlayerItem item)
+        {
+            switch (item.ItemId)
+            {
+                case (int)ItemId.AmuletOfBurning:
+                case (int)ItemId.AmuletOfFoulOdor:
+                    return await DealDamage(item);
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private async Task<string> DealDamage(PlayerItem item)
+        {
+            await _playerItemDataService.PutOnCooldown(item);
+            return $"Your {item.Item.Name} deals some damage.";
         }
     }
 }

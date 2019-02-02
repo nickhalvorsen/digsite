@@ -11,5 +11,6 @@ namespace digsite.DataServices
         public int itemCategoryId;
         public bool isEquipped; 
         public int itemSlotId;
+        public int currentCooldown;
     }
 }

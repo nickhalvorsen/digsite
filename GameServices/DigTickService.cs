@@ -14,6 +14,8 @@ namespace digsite.GameServices
         private readonly NearbyMonsterDataService _nearbyMonsterDataService;
         private readonly PlayerItemDataService _playerItemDataService;
         private readonly ItemDataService _itemDataService;
+        private readonly PlayerItemService _playerItemService;
+        private readonly GameStateDataService _gameStateDataService;
 
         public DigTickService()
         {
@@ -22,11 +24,17 @@ namespace digsite.GameServices
             _nearbyMonsterDataService = new NearbyMonsterDataService();
             _playerItemDataService = new PlayerItemDataService();
             _itemDataService = new ItemDataService();
+            _playerItemService = new PlayerItemService();
+            _gameStateDataService = new GameStateDataService();
         }
 
         public async Task<List<string>> Tick(int playerId)
         {
-            var messages = new List<string>();
+            var gameState = _gameStateDataService.GetGameState(playerId);
+            var messages = new List<string>()
+            {
+                //await ProgressDigging(gameState)
+            };
 
             await _digStateDataService.Progress(playerId);
             if (new Random().Next(1, 10) == 4)
@@ -40,13 +48,23 @@ namespace digsite.GameServices
                 messages.Add(msg);
             }
 
+            var itemMessages = await _playerItemService.ActivateItems(playerId);
+            messages.AddRange(itemMessages);
+
             var monsterMessages = await HandleMonsterAttacks(playerId);
             messages.AddRange(monsterMessages);
             
             messages.Add("you dig a little deeper.");
 
-            return messages;
+            return messages.Where(m => !string.IsNullOrEmpty(m)).ToList();
         }
+
+        //private async Task<List<string>> ProgressDigging(gameStat)
+        //{
+            //_digStateDataService.Progress()
+            //return new List<string>();
+        //}
+
 
         private async Task<string> MonsterApproach(int playerId)
         {
@@ -67,10 +85,9 @@ namespace digsite.GameServices
         private async Task<List<string>> HandleMonsterAttacks(int playerId)
         {
             var digState = await _digStateDataService.Get(playerId);
-            await _nearbyMonsterDataService.CooldownTick(digState.DigStateId);
             var monsters = await _nearbyMonsterDataService.Get(playerId);
+            await _nearbyMonsterDataService.CooldownTick(digState.DigStateId);
             var attackers = monsters.Where(m => m.CurrentAttackCooldown < 0);
-
 
             var messages = new List<string>();
             foreach (var attacker in attackers) 

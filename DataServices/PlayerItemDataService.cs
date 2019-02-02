@@ -65,5 +65,39 @@ namespace digsite.DataServices
                 await context.SaveChangesAsync();
             }
         }
+
+        public async Task CooldownTick(int playerId)
+        {
+            using (var context = new DigsiteContext())
+            {
+                var items = await context.PlayerItem.Where(pi => pi.PlayerId == playerId).ToListAsync();
+                foreach (var item in items)
+                {
+                    if (item.CurrentCooldown > 0)
+                    {
+                        item.CurrentCooldown--;
+                    }
+                }
+
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<PlayerItem>> GetItemsToActivate(int playerId)
+        {
+            using (var context = new DigsiteContext())
+            {
+                return await context.PlayerItem.Where(pi => pi.PlayerId == playerId && pi.CurrentCooldown == 0).ToListAsync(); 
+            }
+        }
+
+        public async Task PutOnCooldown(PlayerItem item)
+        {
+            using (var context = new DigsiteContext())
+            {
+                item.CurrentCooldown = 
+                return await context.PlayerItem.Where(pi => pi.PlayerId == playerId && pi.CurrentCooldown == 0).ToListAsync(); 
+            }
+        }
     }
 }

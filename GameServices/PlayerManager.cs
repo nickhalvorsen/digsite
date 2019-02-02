@@ -113,6 +113,7 @@ namespace digsite.GameServices.PlayerManager
                 , itemCategoryId = playerItem.Item.ItemCategoryId
                 , isEquipped = playerItem.IsEquipped != 0
                 , itemSlotId = playerItem.Item.ItemSlotId
+                , currentCooldown = playerItem.CurrentCooldown
             };
         }
 
