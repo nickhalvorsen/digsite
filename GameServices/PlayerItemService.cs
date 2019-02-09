@@ -11,71 +11,38 @@ namespace digsite.GameServices
 {
     public class PlayerItemService
     {
-        private readonly PlayerItemDataService _playerItemDataService;
         private readonly ItemDataService _itemDataService;
 
         public PlayerItemService()
         {
-            _playerItemDataService = new PlayerItemDataService();
             _itemDataService = new ItemDataService();
         }
 
-        public async Task Unequip(int playerId, int playerItemId)
+        public void Unequip(GameState gameState, int playerItemId)
         {
-            await _playerItemDataService.Unequip(playerItemId);
-        }
-
-        public async Task Equip(int playerId, int playerItemId)
-        {
-            if (!await CanEquipItem(playerItemId))
+            var item = gameState.Player.PlayerItem.FirstOrDefault(pi => pi.PlayerItemId == playerItemId);
+            if (item == null)
             {
                 return;
             }
-
-            await _playerItemDataService.Equip(playerItemId);
+            item.IsEquipped = (byte)0;
         }
 
-        private async Task<bool> CanEquipItem(int playerItemId)
+        public void Equip(GameState gameState, int playerItemId)
         {
-            var playerItem = await _playerItemDataService.Get(playerItemId);
-            var itemSlotId = (await _itemDataService.Get(playerItem.ItemId)).ItemSlotId;
-            var playerItems = await _playerItemDataService.GetPlayer(playerItem.PlayerId);
-
-            return playerItems.Any(pi => pi.Item.ItemSlotId == itemSlotId);
-        }
-
-        public async Task<List<string>> ActivateItems(int playerId)
-        {
-
-            var results = new List<string>();
+            var itemToEquip = gameState.Player.PlayerItem.FirstOrDefault(pi => pi.PlayerItemId == playerItemId);
+            if (itemToEquip == null)
+            {
+                return;
+            }
             
-            var itemsToActivate = await _playerItemDataService.GetItemsToActivate(playerId);
-            foreach (var item in itemsToActivate)
-            {
-                var message = await ActivateItem(item);
-                results.Add(message);
-            }
-            await _playerItemDataService.CooldownTick(playerId);
+            //var baseItem = await _itemDataService.Get(playerItem.ItemId);
+            //var slot = baseItem.;
 
-            return results;
-        }
-
-        private async Task<string> ActivateItem(PlayerItem item)
-        {
-            switch (item.ItemId)
-            {
-                case (int)ItemId.AmuletOfBurning:
-                case (int)ItemId.AmuletOfFoulOdor:
-                    return await DealDamage(item);
-                default:
-                    return string.Empty;
-            }
-        }
-
-        private async Task<string> DealDamage(PlayerItem item)
-        {
-            await _playerItemDataService.PutOnCooldown(item);
-            return $"Your {item.Item.Name} deals some damage.";
+            var ss = itemToEquip.Item.ItemSlotId;
+            var equippedInSameSlot = gameState.Player.PlayerItem.Where(pi => pi.Item.ItemSlotId == itemToEquip.Item.ItemSlotId).ToList();
+            equippedInSameSlot.ForEach(i => i.IsEquipped = (byte)0);
+            itemToEquip.IsEquipped = (byte)1;
         }
     }
 }

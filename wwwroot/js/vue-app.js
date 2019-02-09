@@ -33,6 +33,7 @@ var app = new Vue({
             })
         },
         updateGameData: function(payload) {
+            console.log("received game update payload")
             this.gameState.isLoaded = true
             if (payload.playerState !== null) {
                 console.log("player state: ")
@@ -129,6 +130,7 @@ connection.start()
     })
 
 connection.on('ReceiveGameUpdate', function(payload) {
+    console.log("woot")
     app.updateGameData(payload);
 })
 

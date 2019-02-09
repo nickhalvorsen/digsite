@@ -14,22 +14,18 @@ namespace digsite.GameServices.PlayerManager
     public class PlayerManager
     {
         private IHubContext<DigHub> _hubContext;
-        private PlayerStateDataService _playerStateDataService;
-        private DigStateDataService _digStateDataService;
-        private NearbyMonsterDataService _nearbyMonsterDataService;
-        private PlayerItemDataService _playerItemDataService;
-        private DigTimerService _digTimerService;
+        private GameStateDataService _gameStateDataService;
+        private DiggingService _diggingService;
         private PlayerItemService _playerItemService;
+        private DigTimerService _digTimerService;
 
         public PlayerManager(IHubContext<DigHub> hubContext)
         {
             _hubContext = hubContext;
-            _playerStateDataService = new PlayerStateDataService();
-            _digStateDataService = new DigStateDataService();
-            _nearbyMonsterDataService = new NearbyMonsterDataService();
-            _playerItemDataService = new PlayerItemDataService();
-            _digTimerService = new DigTimerService();
+            _gameStateDataService = new GameStateDataService();
+            _diggingService = new DiggingService();
             _playerItemService = new PlayerItemService();
+            _digTimerService = new DigTimerService();
         }
 
         public async Task GameUpdateData(int playerId)
@@ -39,12 +35,24 @@ namespace digsite.GameServices.PlayerManager
 
         public async Task GameUpdateData(int playerId, List<string> messages)
         {
-            var playerState = await _playerStateDataService.GetPlayerState(playerId);
-            var digState = await _digStateDataService.Get(playerId);
-            var itemState = await _playerItemDataService.GetPlayer(playerId);
+            var gameState = await _gameStateDataService.GetGameState(playerId);
+            await GameUpdateData(gameState, messages);
+        }
+
+        public async Task GameUpdateData(GameState gameState)
+        {
+            await GameUpdateData(gameState, new List<string>());
+        }
+
+        public async Task GameUpdateData(GameState gameState, List<string> messages)
+        {
+            var playerState = gameState.Player.PlayerState;
+            playerState.Player = null;
+            var digState = gameState.Player.DigState;
+            var itemState = gameState.Player.PlayerItem;
 
             var playerStateDto = playerState;
-            var digStateDto = await GetDigStateDto(digState);
+            var digStateDto = GetDigStateDto(digState);
             var playerItemsDto = itemState.Select(ConvertToPlayerItemDto).ToList();
 
             var gameData = MakeGameUpdatePayload(playerStateDto, digStateDto, playerItemsDto);
@@ -53,7 +61,7 @@ namespace digsite.GameServices.PlayerManager
 
             foreach (var message in messages)
             {
-                await SendGameLogMessage(playerId, message);
+                await SendGameLogMessage(gameState.PlayerId, message);
             }
         }
 
@@ -67,9 +75,9 @@ namespace digsite.GameServices.PlayerManager
             };
         }
 
-        private async Task<List<NearbyMonsterDto>> GetNearbyMonstersDto(int playerId)
+        private List<NearbyMonsterDto> GetNearbyMonstersDto(List<NearbyMonster> nearbyMonsters)
         {
-            return (await _nearbyMonsterDataService.Get(playerId))
+            return nearbyMonsters
                 .Select(ConvertToNearbyMonsterDto)
                 .ToList();
         }
@@ -84,7 +92,7 @@ namespace digsite.GameServices.PlayerManager
             };
         }
 
-        private async Task<DigStateDto> GetDigStateDto(DigState digState)
+        private DigStateDto GetDigStateDto(DigState digState)
         {
             if (digState == null)
             {
@@ -100,7 +108,7 @@ namespace digsite.GameServices.PlayerManager
                 , depth = digState.Depth
                 , fuel = digState.Fuel
                 , isPaused = digState.IsPaused > 0 ? true : false
-                , nearbyMonsters = await GetNearbyMonstersDto(digState.PlayerId)
+                , nearbyMonsters = GetNearbyMonstersDto(digState.NearbyMonster.ToList())
             };
         }
 
@@ -119,17 +127,19 @@ namespace digsite.GameServices.PlayerManager
 
         public async Task StartDigging(int playerId)
         {
-            await _digStateDataService.GetOrCreate(playerId); 
-            var state = await _digStateDataService.SetPaused(false, playerId);
-            await _digTimerService.Start(playerId, GameUpdateData);
-            await GameUpdateData(playerId);
+            var gameState = await _gameStateDataService.GetGameState(playerId);
+            _diggingService.StartDigging(gameState, GameUpdateData);
+            await _digTimerService.Start(gameState.PlayerId, GameUpdateData);
+            await _gameStateDataService.SaveGameState(gameState);
+            await GameUpdateData(gameState);
         }
 
         public async Task StopDigging(int playerId)
         {
-            await _digStateDataService.SetPaused(true, playerId);
-            _digTimerService.Stop(playerId);
-            await GameUpdateData(playerId);
+            var gameState = await _gameStateDataService.GetGameState(playerId);
+            _diggingService.PauseDigging(gameState);
+            _digTimerService.Stop(gameState.PlayerId);
+            await GameUpdateData(gameState);
         }
 
         private async Task SendGameLogMessage(int playerId, string message)
@@ -139,20 +149,28 @@ namespace digsite.GameServices.PlayerManager
 
         public async Task UnequipItem(int playerId, int playerItemId)
         {
-            await _playerItemService.Unequip(playerId, playerItemId);
+            var gameState = await _gameStateDataService.GetGameState(playerId);
+            _playerItemService.Unequip(gameState, playerItemId);
+            await _gameStateDataService.SaveGameState(gameState);
+            await GameUpdateData(gameState);
         }
 
         public async Task EquipItem(int playerId, int playerItemId)
         {
-            await _playerItemService.Equip(playerId, playerItemId);
+            var gameState = await _gameStateDataService.GetGameState(playerId);
+            _playerItemService.Equip(gameState, playerItemId);
+            await _gameStateDataService.SaveGameState(gameState);
+            await GameUpdateData(gameState);
         }
 
         public async Task ReturnToSurface(int playerId) 
         {
-            _digTimerService.Stop(playerId);
-            await _digStateDataService.Clear(playerId);
+            var gameState = await _gameStateDataService.GetGameState(playerId);
+            _diggingService.ReturnToSurface(gameState);
+            _digTimerService.Stop(gameState.PlayerId);
             var message = new List<string> { "you return to the surface." };
-            await GameUpdateData(playerId, message);
+            await _gameStateDataService.SaveGameState(gameState);
+            await GameUpdateData(gameState, message);
         }
     }
 }

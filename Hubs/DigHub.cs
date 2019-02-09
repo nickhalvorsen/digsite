@@ -9,6 +9,7 @@ using System.Timers;
 
 namespace digsite.Hubs
 {
+    // This class directly recieves requests from the front end.
     public class DigHub : Hub
     {
         private PlayerManager _playerManager;
