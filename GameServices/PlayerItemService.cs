@@ -36,10 +36,6 @@ namespace digsite.GameServices
                 return;
             }
             
-            //var baseItem = await _itemDataService.Get(playerItem.ItemId);
-            //var slot = baseItem.;
-
-            var ss = itemToEquip.Item.ItemSlotId;
             var equippedInSameSlot = gameState.Player.PlayerItem.Where(pi => pi.Item.ItemSlotId == itemToEquip.Item.ItemSlotId).ToList();
             equippedInSameSlot.ForEach(i => i.IsEquipped = (byte)0);
             itemToEquip.IsEquipped = (byte)1;

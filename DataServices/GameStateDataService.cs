@@ -1,5 +1,3 @@
-
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,14 +27,8 @@ namespace digsite.DataServices
 
         public async Task SaveGameState(GameState gameState)
         {
-
-
-
-
             using (var context = new DigsiteContext())
             {
-
-
                 context.Attach(gameState);
 
                 IEnumerable<EntityEntry> unchangedEntities = context.ChangeTracker.Entries().Where(x => x.State == EntityState.Unchanged);
@@ -45,21 +37,6 @@ namespace digsite.DataServices
                     ee.State = EntityState.Modified;
                 }
 
-                await context.SaveChangesAsync();
-
-return;
-                context.Entry(gameState).State = EntityState.Modified;
-                context.Entry(gameState.Player).State = EntityState.Modified;
-                context.Entry(gameState.Player.PlayerState).State = EntityState.Modified;
-                if (gameState.Player.DigState != null)
-                {
-                    context.Entry(gameState.Player.DigState).State = EntityState.Modified;
-                }
-                if (gameState.Player.DigState.NearbyMonster != null)
-                {
-                    context.Entry(gameState.Player.DigState.NearbyMonster).State = EntityState.Modified;
-                }
-                context.Entry(gameState.Player.PlayerItem).State = EntityState.Modified;
                 await context.SaveChangesAsync();
             }
         }

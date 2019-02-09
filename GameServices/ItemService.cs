@@ -10,19 +10,18 @@ namespace digsite.GameServices
     {
         public List<string> ActivateItems(GameState gameState)
         {
-            var itemsToActivate = GetItemsToActivate(gameState);
-            return itemsToActivate.Select(ActivateItem).ToList();
+            return gameState.Player.PlayerItem.Where(ShouldActivateItem)
+            .Select(ActivateItem).ToList();
         }
 
-        private List<PlayerItem> GetItemsToActivate(GameState gameState)
+        private bool ShouldActivateItem(PlayerItem playerItem)
         {
-            return gameState.Player.PlayerItem.Where(pi => pi.CurrentCooldown == 0).ToList();
+            return playerItem.CurrentCooldown == 0 && playerItem.IsEquipped == (byte)1;
         }
 
         private string ActivateItem(PlayerItem item)
         {
-            // todo scaffold database to add this column
-            //item.CurrentCooldown = item.Item.Cooldown;
+            item.CurrentCooldown = item.Item.Cooldown;
             return $"{item.Item.Name} activated.";
         }
     }

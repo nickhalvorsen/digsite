@@ -23,6 +23,11 @@
         background: black;
     }
 
+    .item.non-equippable:hover {
+        color: white;
+        background: #999;
+    }
+
     .itemPendingServerUpdate { 
         color: #666;
         background: #eee;
@@ -79,7 +84,7 @@
                     <div v-if="playerItem.isPendingServerUpdate" class="item itemPendingServerUpdate">
                         <digsite-item :item="playerItem"/>
                     </div>
-                    <div v-if="!playerItem.IsPendingServerUpdate && playerItem.itemSlotId <= 1" class="item">
+                    <div v-if="!playerItem.IsPendingServerUpdate && playerItem.itemSlotId <= 1" class="item non-equippable">
                         <digsite-item :item="playerItem"/>
                     </div>
                     <div v-if="!playerItem.isPendingServerUpdate && playerItem.itemSlotId > 1" v-on:click="unequipItem(playerItem.playerItemId)" class="item equippable">
