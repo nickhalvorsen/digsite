@@ -24,8 +24,7 @@
     }
 
     .item.non-equippable:hover {
-        color: white;
-        background: #999;
+        background: #EEE;
     }
 
     .itemPendingServerUpdate { 
@@ -67,7 +66,7 @@
         </div>
         <div class="panel3">
             <div class="monsters">
-                nearby monsters: 
+                <h3>Nearby monsters</h3>
                 <br>
                 <div v-for="monster in digState.nearbyMonsters">
                     {{ monster.name }} ({{ monster.currentHealth }} / {{ monster.maxHealth }})
@@ -76,10 +75,11 @@
         </div>
         <div class="panel3">
             <div class="items">
-                items:
+                <h3>Items</h3>
                 <br>
-                equipped:
                 <hr/>
+                <b>Equipped:</b>
+                <br>
                 <div v-for="playerItem in itemState" v-if="playerItem.isEquipped">
                     <div v-if="playerItem.isPendingServerUpdate" class="item itemPendingServerUpdate">
                         <digsite-item :item="playerItem"/>
@@ -97,7 +97,7 @@
                     <div v-if="playerItem.isPendingServerUpdate" class="item itemPendingServerUpdate">
                         <digsite-item :item="playerItem"/>
                     </div>
-                    <div v-if="!playerItem.IsPendingServerUpdate && playerItem.itemSlotId <= 1" class="item">
+                    <div v-if="!playerItem.IsPendingServerUpdate && playerItem.itemSlotId <= 1" class="item non-equippable">
                         <digsite-item :item="playerItem"/>
                     </div>
                     <div v-if="!playerItem.isPendingServerUpdate && playerItem.itemSlotId > 1" v-on:click="equipItem(playerItem.playerItemId)" class="item equippable">

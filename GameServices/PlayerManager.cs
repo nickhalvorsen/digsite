@@ -121,6 +121,7 @@ namespace digsite.GameServices.PlayerManager
                 , itemCategoryId = playerItem.Item.ItemCategoryId
                 , isEquipped = playerItem.IsEquipped != 0
                 , itemSlotId = playerItem.Item.ItemSlotId
+                , slotName = playerItem.Item.ItemSlot.Description
                 , currentCooldown = playerItem.CurrentCooldown
             };
         }

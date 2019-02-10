@@ -19,6 +19,7 @@ namespace digsite.DataServices
                     .Include(gs => gs.Player.DigState)
                     .Include(gs => gs.Player.PlayerItem)
                         .ThenInclude(pi => pi.Item)
+                        .ThenInclude(i => i.ItemSlot)
                     .Include(gs => gs.Player.DigState.NearbyMonster)
                         .ThenInclude(nm => nm.Monster)
                     .SingleAsync(gs => gs.PlayerId == playerId);
