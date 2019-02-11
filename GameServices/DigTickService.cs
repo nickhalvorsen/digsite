@@ -37,12 +37,15 @@ namespace digsite.GameServices
                 , MonsterApproach(gameState)
                 , new List<string>() { "You dig a little deeper." }
             };
+            await _gameStateDataService.SaveGameState(gameState);
             return messageLists.SelectMany(m => m).Where(m => !string.IsNullOrEmpty(m)).ToList();
         }
         
         private List<string> ActivateItems(GameState gameState)
         {
-            return _itemService.ActivateItems(gameState);
+            var messages = _itemService.ActivateItems(gameState);
+            _itemService.CooldownTick(gameState);
+            return messages;
         }
 
         private List<string> MonsterAttacks(GameState gameState)
