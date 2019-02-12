@@ -9,6 +9,21 @@ namespace digsite.GameServices
 {
     public class MonsterCombatService
     {
+        public List<string> HandleMonsterDeaths(GameState gameState)
+        {
+            var dead = gameState.Player.DigState.NearbyMonster.Where(nm => nm.CurrentHealth <= 0).ToList();
+
+            foreach (var d in dead)
+            {
+                gameState.Player.DigState.NearbyMonster.Remove(d);
+            }
+
+            //gameState.Player.DigState.NearbyMonster = 
+                //gameState.Player.DigState.NearbyMonster.Where(nm => nm.CurrentHealth > 0).ToList();
+
+            return dead.Select(d => $"{d.Monster.Name} was defeated.").ToList();
+        }
+
         public List<string> HandleMonsterAttacks(GameState gameState)
         {
             var attackers = GetMonstersThatWillAttack(gameState);

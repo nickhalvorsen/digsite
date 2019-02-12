@@ -95,6 +95,10 @@ namespace digsite.Data
 
                 entity.Property(e => e.Cooldown).HasColumnType("int(11)");
 
+                entity.Property(e => e.Description)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ItemCategoryId).HasColumnType("int(11)");
 
                 entity.Property(e => e.ItemSlotId)

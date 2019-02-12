@@ -15,6 +15,7 @@ namespace digsite.Data
         public string Name { get; set; }
         public int ItemSlotId { get; set; }
         public int Cooldown { get; set; }
+        public string Description { get; set; }
 
         public ItemCategory ItemCategory { get; set; }
         public ItemSlot ItemSlot { get; set; }

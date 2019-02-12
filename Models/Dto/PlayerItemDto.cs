@@ -13,5 +13,6 @@ namespace digsite.DataServices
         public int itemSlotId;
         public int currentCooldown;
         public string slotName;
+        public string description;
     }
 }

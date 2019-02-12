@@ -130,10 +130,9 @@ connection.start()
     })
 
 connection.on('ReceiveGameUpdate', function(payload) {
-    console.log("woot")
-    app.updateGameData(payload);
+    app.updateGameData(payload)
 })
 
 connection.on('ReceiveGameLogMessage', function(message) {
-    app.addMessage(message);
+    app.addMessage(message)
 })

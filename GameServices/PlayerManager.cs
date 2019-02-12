@@ -123,6 +123,7 @@ namespace digsite.GameServices.PlayerManager
                 , itemSlotId = playerItem.Item.ItemSlotId
                 , slotName = playerItem.Item.ItemSlot.Description
                 , currentCooldown = playerItem.CurrentCooldown
+                , description = playerItem.Item.Description
             };
         }
 

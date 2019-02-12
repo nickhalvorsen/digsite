@@ -15,6 +15,7 @@ namespace digsite.GameServices
         private readonly ItemService _itemService;
         private readonly MonsterCombatService _monsterCombatService;
         private readonly MonsterEncounterService _monsterEncounterService;
+        private readonly ItemDiscoveryService _itemDiscoveryService;
 
         public DigTickService()
         {
@@ -23,6 +24,7 @@ namespace digsite.GameServices
             _itemService = new ItemService();
             _monsterCombatService = new MonsterCombatService();
             _monsterEncounterService = new MonsterEncounterService();
+            _itemDiscoveryService = new ItemDiscoveryService();
         }
 
         public async Task<List<string>> Tick(int playerId)
@@ -31,6 +33,7 @@ namespace digsite.GameServices
             var messageLists = new List<List<string>>()
             {
                  ActivateItems(gameState)
+                , HandleMonsterDeaths(gameState)
                 , MonsterAttacks(gameState)
                 , ProgressDigging(gameState)
                 , FindItems(gameState)
@@ -48,6 +51,11 @@ namespace digsite.GameServices
             return messages;
         }
 
+        private List<string> HandleMonsterDeaths(GameState gameState)
+        {
+            return _monsterCombatService.HandleMonsterDeaths(gameState).ToList();
+        }
+
         private List<string> MonsterAttacks(GameState gameState)
         {
             return _monsterCombatService.HandleMonsterAttacks(gameState);
@@ -61,8 +69,7 @@ namespace digsite.GameServices
 
         private List<string> FindItems(GameState gameState)
         {
-            // todo 
-            return new List<string>();
+            return _itemDiscoveryService.FindItems(gameState);
         }
 
         private List<string> MonsterApproach(GameState gameState)

@@ -31,7 +31,7 @@ namespace digsite.DataServices
             using (var context = new DigsiteContext())
             {
                 context.Attach(gameState);
-
+                RemoveDeleted(context, gameState);
                 IEnumerable<EntityEntry> unchangedEntities = context.ChangeTracker.Entries().Where(x => x.State == EntityState.Unchanged);
 
                 foreach(EntityEntry ee in unchangedEntities){
@@ -40,6 +40,31 @@ namespace digsite.DataServices
 
                 await context.SaveChangesAsync();
             }
+
+        }
+
+        private void RemoveDeleted(DigsiteContext context, GameState gameState)
+        {
+            RemoveDeletedPlayerItems(context, gameState);
+            RemoveDeletedNearbyMonsters(context, gameState);
+        }
+
+        private void RemoveDeletedPlayerItems(DigsiteContext context, GameState gameState)
+        {
+            var existingItems = context.PlayerItem.Where(pi => pi.PlayerId == gameState.PlayerId);
+            var itemsToDelete = existingItems.Where(ei => !gameState.Player.PlayerItem.Any(pi => pi.PlayerItemId == ei.PlayerItemId));
+            context.PlayerItem.RemoveRange(itemsToDelete);
+        }
+
+        private void RemoveDeletedNearbyMonsters(DigsiteContext context, GameState gameState)
+        {
+            if (gameState.Player.DigState == null) 
+            {
+                return;
+            }
+            var existingMonsters = context.NearbyMonster.Where(nm => nm.DigState.PlayerId == gameState.PlayerId);
+            var monstersToDelete = existingMonsters.Where(em => !gameState.Player.DigState.NearbyMonster.Any(nm => nm.NearbyMonsterId == em.NearbyMonsterId));
+            context.NearbyMonster.RemoveRange(monstersToDelete);
         }
     }
 }
