@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using digsite.Data;
 
@@ -55,6 +56,7 @@ namespace digsite.GameServices
         public void ReturnToSurface(GameState gameState)
         {
             gameState.Player.DigState = null;
+            gameState.Player.PlayerItem.ToList().ForEach(pi => pi.CurrentCooldown = 0);
         }
     }
 }

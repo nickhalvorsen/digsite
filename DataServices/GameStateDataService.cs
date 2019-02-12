@@ -30,9 +30,8 @@ namespace digsite.DataServices
         {
             using (var context = new DigsiteContext())
             {
-                RemoveDeleted(context, gameState);
-
                 context.Attach(gameState);
+                RemoveDeleted(context, gameState);
                 IEnumerable<EntityEntry> unchangedEntities = context.ChangeTracker.Entries().Where(x => x.State == EntityState.Unchanged);
 
                 foreach(EntityEntry ee in unchangedEntities){
@@ -70,10 +69,12 @@ namespace digsite.DataServices
 
         private void RemoveDeletedDigState(DigsiteContext context, GameState gameState)
         {
+            // Need to use this variable because a null gamestate.digstate turns into not null when attached by the parent function
+            var gameStateDigIsNull = gameState.Player.DigState == null;
             var contextDigState = context.DigState.SingleOrDefault(ds => ds.PlayerId == gameState.PlayerId);
-            if (contextDigState != null && gameState.Player.DigState == null)
+            if (contextDigState != null && gameStateDigIsNull)
             {
-                context.Remove(contextDigState);
+                context.DigState.Remove(contextDigState);
             }
         }
     }

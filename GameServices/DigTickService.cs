@@ -37,7 +37,7 @@ namespace digsite.GameServices
             }
             var messageLists = new List<List<string>>()
             {
-                 ActivateItems(gameState)
+                ActivateItems(gameState)
                 , HandleMonsterDeaths(gameState)
                 , MonsterAttacks(gameState)
                 , ProgressDigging(gameState)
@@ -48,7 +48,7 @@ namespace digsite.GameServices
             await _gameStateDataService.SaveGameState(gameState);
             return messageLists.SelectMany(m => m).Where(m => !string.IsNullOrEmpty(m)).ToList();
         }
-        
+
         private List<string> ActivateItems(GameState gameState)
         {
             var messages = _itemService.ActivateItems(gameState);
