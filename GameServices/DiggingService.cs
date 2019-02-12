@@ -37,6 +37,11 @@ namespace digsite.GameServices
 
         public void PauseDigging(GameState gameState)
         {
+            if (gameState.Player.DigState == null)
+            {
+                return;
+            }
+
             gameState.Player.DigState.IsPaused = (byte)1;
         }
 

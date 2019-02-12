@@ -30,6 +30,11 @@ namespace digsite.GameServices
         public async Task<List<string>> Tick(int playerId)
         {
             var gameState = await _gameStateDataService.GetGameState(playerId);
+            if (gameState.Player.DigState == null)
+            {
+                _diggingService.PauseDigging(gameState);
+                return new List<string>();
+            }
             var messageLists = new List<List<string>>()
             {
                  ActivateItems(gameState)
