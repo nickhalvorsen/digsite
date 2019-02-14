@@ -22,7 +22,12 @@ namespace digsite.GameServices
         {
             var items = new List<DropTableItem> 
             {
-
+                new DropTableItem((int)ItemId.RustedTableLeg, 20)
+                , new DropTableItem((int)ItemId.BrassCandlestick, 20)
+                , new DropTableItem((int)ItemId.CowboyHat, 40)
+                , new DropTableItem((int)ItemId.BackwardsBallcap, 40)
+                , new DropTableItem((int)ItemId.AmuletOfBurning, 40)
+                , new DropTableItem((int)ItemId.AmuletOfFoulOdor, 40)
             };
             return new DropTable(items);
 

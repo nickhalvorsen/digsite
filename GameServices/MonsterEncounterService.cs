@@ -22,7 +22,8 @@ namespace digsite.GameServices
         {
             var monsters = new List<MonsterTableMonster>
             {
-
+                new MonsterTableMonster((int)MonsterId.Monster1, 40)
+                , new MonsterTableMonster((int)MonsterId.Monster2, 30)
             };
             return new MonsterTable(monsters);
         }
