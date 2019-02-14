@@ -18,6 +18,7 @@ namespace digsite.GameServices.PlayerManager
         private DiggingService _diggingService;
         private PlayerItemService _playerItemService;
         private DigTimerService _digTimerService;
+        private PlayerItemUpgradeService _playerItemUpgradeService;
 
         public PlayerManager(IHubContext<DigHub> hubContext)
         {
@@ -26,6 +27,7 @@ namespace digsite.GameServices.PlayerManager
             _diggingService = new DiggingService();
             _playerItemService = new PlayerItemService();
             _digTimerService = new DigTimerService();
+            _playerItemUpgradeService = new PlayerItemUpgradeService();
         }
 
         public async Task GameUpdateData(int playerId)
@@ -171,6 +173,14 @@ namespace digsite.GameServices.PlayerManager
             _diggingService.ReturnToSurface(gameState);
             _digTimerService.Stop(gameState.PlayerId);
             var message = new List<string> { "you return to the surface." };
+            await _gameStateDataService.SaveGameState(gameState);
+            await GameUpdateData(gameState, message);
+        }
+
+        public async Task UpgradeItem(int playerId, int playerItemId1, int playerItemId2)
+        {
+            var gameState = await _gameStateDataService.GetGameState(playerId);
+            var message = _itemUpgradeService.UpgradeItem(playerItemId1, playerItemId2); 
             await _gameStateDataService.SaveGameState(gameState);
             await GameUpdateData(gameState, message);
         }

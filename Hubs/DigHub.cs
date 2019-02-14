@@ -49,6 +49,11 @@ namespace digsite.Hubs
             await _playerManager.GameUpdateData(playerId);
         }
 
+        public async Task UpgradeItem(int playerId, int playerItemId1, int playerItemId2)
+        {
+            await _playerManager.UpgradeItem(playerId, playerItemId1, playerItemId2);
+        }
+
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             var s = Context.User.Identity;
