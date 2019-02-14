@@ -18,9 +18,6 @@ namespace digsite.GameServices
                 gameState.Player.DigState.NearbyMonster.Remove(d);
             }
 
-            //gameState.Player.DigState.NearbyMonster = 
-                //gameState.Player.DigState.NearbyMonster.Where(nm => nm.CurrentHealth > 0).ToList();
-
             return dead.Select(d => $"{d.Monster.Name} was defeated.").ToList();
         }
 

@@ -16,6 +16,7 @@ namespace digsite.GameServices
         private readonly MonsterCombatService _monsterCombatService;
         private readonly MonsterEncounterService _monsterEncounterService;
         private readonly ItemDiscoveryService _itemDiscoveryService;
+        private readonly PlayerDeathService _playerDeathService;
 
         public DigTickService()
         {
@@ -25,6 +26,7 @@ namespace digsite.GameServices
             _monsterCombatService = new MonsterCombatService();
             _monsterEncounterService = new MonsterEncounterService();
             _itemDiscoveryService = new ItemDiscoveryService();
+            _playerDeathService = new PlayerDeathService();
         }
 
         public async Task<List<string>> Tick(int playerId)
@@ -40,6 +42,7 @@ namespace digsite.GameServices
                 ActivateItems(gameState)
                 , HandleMonsterDeaths(gameState)
                 , MonsterAttacks(gameState)
+                , HandlePlayerDeath(gameState)
                 , ProgressDigging(gameState)
                 , FindItems(gameState)
                 , MonsterApproach(gameState)
@@ -64,6 +67,11 @@ namespace digsite.GameServices
         private List<string> MonsterAttacks(GameState gameState)
         {
             return _monsterCombatService.HandleMonsterAttacks(gameState);
+        }
+
+        private List<string> HandlePlayerDeath(GameState gameState)
+        {
+            return _playerDeathService.HandlePlayerDeath(gameState);
         }
 
         private List<string> ProgressDigging(GameState gameState)
