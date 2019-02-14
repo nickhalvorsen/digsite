@@ -12,10 +12,6 @@ namespace digsite.GameServices
         {
             var dropTable = GetDropTable(gameState);
             var foundItemIds = dropTable.Roll();
-            if (!foundItemIds.Any())
-            {
-                return new List<string>();
-            }
             var foundItems = GetFoundItems(foundItemIds).ToList();
 
             AddItems(gameState, foundItems);

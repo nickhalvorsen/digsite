@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using digsite.Data;
+using digsite.DataServices;
+using digsite.Models;
 
 namespace digsite.GameServices
 {
@@ -8,43 +11,57 @@ namespace digsite.GameServices
     {
         public List<string> GenerateMonsterEncounters(GameState gameState)
         {
-            if (!ARandomEncounterOccurred())
+            var monsterTable = GetMonsterTable(gameState);
+            var encounteredMonsterIds = monsterTable.Roll();
+            var encounteredMonsters = GetMonsters(encounteredMonsterIds).ToList();
+            AddEncounteredMonsters(gameState, encounteredMonsters);
+            return encounteredMonsters.Select(em => $"A {em.Name} approaches.").ToList();
+        }
+
+        private MonsterTable GetMonsterTable(GameState gameState)
+        {
+            var monsters = new List<MonsterTableMonster>
             {
-                return new List<string>();
+
+            };
+            return new MonsterTable(monsters);
+        }
+
+        private IEnumerable<Monster> GetMonsters(List<int> monsterIds)
+        {
+            var monsterDataService = new MonsterDataService();
+
+            foreach (var monsterId in monsterIds)
+            {
+                var monster = monsterDataService.Get(monsterId);
+                if (monster == null)
+                {
+                    continue;
+                }
+
+                yield return monster;
             }
-
-            var monster = GenerateRandomMonsterEncounter(gameState);
-            gameState.Player.DigState.NearbyMonster.Add(monster);
-            return new List<string> { $"A {monster.Monster.Name} approaches."};
         }
 
-        private bool ARandomEncounterOccurred()
+        private void AddEncounteredMonsters(GameState gameState, List<Monster> monsters)
         {
-            var rand = new Random().Next(1, 4);
-            return rand == 1;
+            monsters.ForEach(m => AddEncounteredMonster(gameState, m));
         }
 
-        private NearbyMonster GenerateRandomMonsterEncounter(GameState gameState)
+        private void AddEncounteredMonster(GameState gameState, Monster monster)
         {
-            var monsterTemplate = GetBaseMonster();
+            var nearbyMonster = GenerateMonsterFromTemplate(monster);
+            gameState.Player.DigState.NearbyMonster.Add(nearbyMonster);
+        }
+
+        private NearbyMonster GenerateMonsterFromTemplate(Monster monster)
+        {
             return new NearbyMonster()
             {
-                CurrentAttackCooldown = monsterTemplate.AttackRate,
-                CurrentHealth = monsterTemplate.Health,
-                MonsterId = monsterTemplate.MonsterId,
-                Monster = monsterTemplate
-            };
-        }
-
-        private Monster GetBaseMonster()
-        {
-            return new Monster()
-            {
-                MonsterId = 1,
-                Name = "cat",
-                Attack = 1,
-                AttackRate = 6,
-                Health = 15,
+                CurrentAttackCooldown = monster.AttackRate,
+                CurrentHealth = monster.Health,
+                MonsterId = monster.MonsterId,
+                Monster = monster
             };
         }
     }

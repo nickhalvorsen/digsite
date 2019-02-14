@@ -6,11 +6,11 @@ namespace digsite.DataServices
 {
     public class MonsterDataService
     {
-        public async Task<Monster> Get(int monsterId)
+        public Monster Get(int monsterId)
         {
             using (var context = new DigsiteContext())
             {
-                return await context.Monster.FindAsync(monsterId);
+                return context.Monster.Find(monsterId);
             }
         }
     }
