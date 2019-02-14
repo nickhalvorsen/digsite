@@ -51,6 +51,7 @@ namespace digsite.Hubs
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
+            var s = Context.User.Identity;
             // todo this will error if dig state doesnt exist
             await _playerManager.StopDigging(1001);
             await base.OnDisconnectedAsync(exception);

@@ -12,7 +12,7 @@ namespace digsite.GameServices
     {
         private readonly GameStateDataService _gameStateDataService;
         private readonly DiggingService _diggingService;
-        private readonly ItemService _itemService;
+        private readonly PlayerItemService _playerItemService;
         private readonly MonsterCombatService _monsterCombatService;
         private readonly MonsterEncounterService _monsterEncounterService;
         private readonly ItemDiscoveryService _itemDiscoveryService;
@@ -21,7 +21,7 @@ namespace digsite.GameServices
         {
             _gameStateDataService = new GameStateDataService();
             _diggingService = new DiggingService();
-            _itemService = new ItemService();
+            _playerItemService = new PlayerItemService();
             _monsterCombatService = new MonsterCombatService();
             _monsterEncounterService = new MonsterEncounterService();
             _itemDiscoveryService = new ItemDiscoveryService();
@@ -51,8 +51,8 @@ namespace digsite.GameServices
 
         private List<string> ActivateItems(GameState gameState)
         {
-            var messages = _itemService.ActivateItems(gameState);
-            _itemService.CooldownTick(gameState);
+            var messages = _playerItemService.ActivateItems(gameState);
+            _playerItemService.CooldownTick(gameState);
             return messages;
         }
 
