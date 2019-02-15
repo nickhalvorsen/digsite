@@ -115,6 +115,36 @@ var app = new Vue({
             connection.invoke('returnToSurface', this.gameState.playerId).catch(function (err) {
                 return console.error(err.toString())
             });
+        },
+        getBackpackItemCssClass: function(item) {
+            if (item.isAwaitingServerResponse) {
+                return  {
+                    'item': true
+                    ,'itemPendingServerUpdate': true
+                }
+            }
+            else if (item.itemSlotId > 1) {
+                return  {
+                    'item': true
+                    ,'clickable': true
+                }
+            }
+
+            return {
+                'item': true
+                ,'non-clickable': true
+            }
+        },
+        backpackItemClicked: function(item) {
+            if (item.isAwaitingServerResponse) {
+                return;
+            }
+            else if (item.isEquipped) {
+                this.unequipItem(item.playerItemId)
+            }
+            else if (item.itemSlotId > 1) {
+                this.equipItem(item.playerItemId)
+            }
         }
     }
 })
