@@ -60,7 +60,7 @@ namespace digsite.GameServices
 
         private bool ShouldActivateItem(PlayerItem playerItem)
         {
-            return playerItem.CurrentCooldown == 0 && playerItem.IsEquipped == (byte)1;
+            return playerItem.CurrentCooldown <= 0 && playerItem.IsEquipped == (byte)1;
         }
 
         private string ActivateItem(GameState gameState, PlayerItem item)
