@@ -236,6 +236,8 @@ namespace digsite.Data
 
                 entity.Property(e => e.PlayerId).HasColumnType("int(11)");
 
+                entity.Property(e => e.UpgradeLevel).HasColumnType("int(11)");
+
                 entity.HasOne(d => d.Item)
                     .WithMany(p => p.PlayerItem)
                     .HasForeignKey(d => d.ItemId)

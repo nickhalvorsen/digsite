@@ -27,6 +27,10 @@
         background: #EEE;
     }
 
+    .item.selected {
+        background: lightblue;
+    }
+
     .itemPendingServerUpdate { 
         color: #666;
         background: #eee;
@@ -111,7 +115,7 @@
         <div style="clear:both;">
 
 item upgrader
-        <digsite-item-upgrader :items="itemState"/>
+        <digsite-item-upgrader :items="itemState" :player-id="gameState.playerId"/>
         </div>
 
     </div>

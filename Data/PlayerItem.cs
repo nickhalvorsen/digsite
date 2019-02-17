@@ -10,7 +10,7 @@ namespace digsite.Data
         public int ItemId { get; set; }
         public byte IsEquipped { get; set; }
         public int CurrentCooldown { get; set; }
-        public int? UpgradeLevel { get; set; }
+        public int UpgradeLevel { get; set; }
 
         public Item Item { get; set; }
         public Player Player { get; set; }

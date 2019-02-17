@@ -119,6 +119,7 @@ namespace digsite.GameServices.PlayerManager
             return new PlayerItemDto
             {
                 playerItemId = playerItem.PlayerItemId
+                , itemId = playerItem.ItemId
                 , name = playerItem.Item.Name
                 , itemCategoryId = playerItem.Item.ItemCategoryId
                 , isEquipped = playerItem.IsEquipped != 0
@@ -126,6 +127,7 @@ namespace digsite.GameServices.PlayerManager
                 , slotName = playerItem.Item.ItemSlot.Description
                 , currentCooldown = playerItem.CurrentCooldown
                 , description = playerItem.Item.Description
+                , upgradeLevel = playerItem.UpgradeLevel
             };
         }
 

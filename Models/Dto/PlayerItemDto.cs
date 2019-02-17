@@ -7,6 +7,7 @@ namespace digsite.DataServices
     public class PlayerItemDto
     {
         public int playerItemId;
+        public int itemId;
         public string name;
         public int itemCategoryId;
         public bool isEquipped; 
@@ -14,5 +15,6 @@ namespace digsite.DataServices
         public int currentCooldown;
         public string slotName;
         public string description;
+        public int upgradeLevel;
     }
 }

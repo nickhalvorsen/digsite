@@ -57,7 +57,7 @@ namespace digsite.GameServices
 
         private bool WasUpgradeSuccessful()
         {
-            return new Random().Next(1, 2) == 1;
+            return new Random().Next(0, 2) == 1;
         }
     }
 }
