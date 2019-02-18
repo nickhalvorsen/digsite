@@ -75,6 +75,9 @@ Vue.component('digsite-item-upgrader', {
       connection.invoke('upgradeItem', this.playerId, this.selectedItem1.playerItemId, this.selectedItem2.playerItemId).catch(function (err) {
           return console.error(err.toString())
       });
+
+      this.selectedItem1 = this.defaultSelectedItem; 
+      this.selectedItem2 = this.defaultSelectedItem; 
     },
     getUpgraderItemCssClass: function(item) {
 
@@ -112,7 +115,8 @@ Vue.component('digsite-item-upgrader', {
   },
   template: `
   <div class="item-upgrader">
-  <button v-on:click="submitUpgrade">submit upgrade</button>
+    <h3>item upgrader</h3>
+    <button v-on:click="submitUpgrade" :disabled="this.selectedItem2.playerItemId === -1 || this.selectedItem1.playerItemId === -1">submit upgrade</button>
     <div v-for="item in items">
         <div v-bind:class="getUpgraderItemCssClass(item)" v-on:click="selectItem(item)">
             <digsite-item :item="item"/>

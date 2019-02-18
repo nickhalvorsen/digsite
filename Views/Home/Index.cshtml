@@ -5,8 +5,14 @@
 </head>
 
 <style>
+
+    body {
+        background: #b39c71;
+    }
+
     .monsters 
-    , .items{
+    , .items
+    , .item-upgrader{
         border: 1px solid black;
         padding: 1em;
         margin: 1em;
@@ -46,6 +52,7 @@
     .item {
         cursor: default;
     }
+
 
 </style>
 
@@ -112,10 +119,14 @@
             </div>
         </div>
         <br>
-        <div style="clear:both;">
-
-item upgrader
-        <digsite-item-upgrader :items="itemState" :player-id="gameState.playerId"/>
+        <div style="clear:both;"/>
+<br>
+<br>
+        <div>
+            <div class="panel3">
+                <digsite-item-upgrader :items="itemState" :player-id="gameState.playerId"/>
+            </div>
+        </div>
         </div>
 
     </div>
