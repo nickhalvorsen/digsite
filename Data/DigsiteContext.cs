@@ -15,6 +15,7 @@ namespace digsite.Data
         {
         }
 
+        public virtual DbSet<Buff> Buff { get; set; }
         public virtual DbSet<DigState> DigState { get; set; }
         public virtual DbSet<GameState> GameState { get; set; }
         public virtual DbSet<Item> Item { get; set; }
@@ -22,7 +23,9 @@ namespace digsite.Data
         public virtual DbSet<ItemSlot> ItemSlot { get; set; }
         public virtual DbSet<Monster> Monster { get; set; }
         public virtual DbSet<NearbyMonster> NearbyMonster { get; set; }
+        public virtual DbSet<NearbyMonsterBuff> NearbyMonsterBuff { get; set; }
         public virtual DbSet<Player> Player { get; set; }
+        public virtual DbSet<PlayerBuff> PlayerBuff { get; set; }
         public virtual DbSet<PlayerItem> PlayerItem { get; set; }
         public virtual DbSet<PlayerState> PlayerState { get; set; }
 
@@ -37,6 +40,13 @@ namespace digsite.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Buff>(entity =>
+            {
+                entity.ToTable("Buff", "digsite");
+
+                entity.Property(e => e.BuffId).HasColumnType("int(11)");
+            });
+
             modelBuilder.Entity<DigState>(entity =>
             {
                 entity.ToTable("DigState", "digsite");
@@ -201,6 +211,35 @@ namespace digsite.Data
                     .HasConstraintName("NearbyMonster_ibfk_1");
             });
 
+            modelBuilder.Entity<NearbyMonsterBuff>(entity =>
+            {
+                entity.ToTable("NearbyMonsterBuff", "digsite");
+
+                entity.HasIndex(e => e.BuffId)
+                    .HasName("BuffId");
+
+                entity.HasIndex(e => e.NearbyMonsterId)
+                    .HasName("NearbyMonsterId");
+
+                entity.Property(e => e.NearbyMonsterBuffId).HasColumnType("int(11)");
+
+                entity.Property(e => e.BuffId).HasColumnType("int(11)");
+
+                entity.Property(e => e.NearbyMonsterId).HasColumnType("int(11)");
+
+                entity.Property(e => e.RemainingDuration).HasColumnType("int(11)");
+
+                entity.HasOne(d => d.Buff)
+                    .WithMany(p => p.NearbyMonsterBuff)
+                    .HasForeignKey(d => d.BuffId)
+                    .HasConstraintName("NearbyMonsterBuff_ibfk_2");
+
+                entity.HasOne(d => d.NearbyMonster)
+                    .WithMany(p => p.NearbyMonsterBuff)
+                    .HasForeignKey(d => d.NearbyMonsterId)
+                    .HasConstraintName("NearbyMonsterBuff_ibfk_1");
+            });
+
             modelBuilder.Entity<Player>(entity =>
             {
                 entity.ToTable("Player", "digsite");
@@ -210,6 +249,35 @@ namespace digsite.Data
                 entity.Property(e => e.Email)
                     .HasMaxLength(500)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<PlayerBuff>(entity =>
+            {
+                entity.ToTable("PlayerBuff", "digsite");
+
+                entity.HasIndex(e => e.BuffId)
+                    .HasName("BuffId");
+
+                entity.HasIndex(e => e.PlayerId)
+                    .HasName("PlayerId");
+
+                entity.Property(e => e.PlayerBuffId).HasColumnType("int(11)");
+
+                entity.Property(e => e.BuffId).HasColumnType("int(11)");
+
+                entity.Property(e => e.PlayerId).HasColumnType("int(11)");
+
+                entity.Property(e => e.RemainingDuration).HasColumnType("int(11)");
+
+                entity.HasOne(d => d.Buff)
+                    .WithMany(p => p.PlayerBuff)
+                    .HasForeignKey(d => d.BuffId)
+                    .HasConstraintName("PlayerBuff_ibfk_2");
+
+                entity.HasOne(d => d.Player)
+                    .WithMany(p => p.PlayerBuff)
+                    .HasForeignKey(d => d.PlayerId)
+                    .HasConstraintName("PlayerBuff_ibfk_1");
             });
 
             modelBuilder.Entity<PlayerItem>(entity =>

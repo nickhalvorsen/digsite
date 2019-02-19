@@ -17,6 +17,7 @@ namespace digsite.GameServices
         private readonly MonsterEncounterService _monsterEncounterService;
         private readonly ItemDiscoveryService _itemDiscoveryService;
         private readonly PlayerDeathService _playerDeathService;
+        private readonly BuffService _buffService;
 
         public DigTickService()
         {
@@ -27,6 +28,7 @@ namespace digsite.GameServices
             _monsterEncounterService = new MonsterEncounterService();
             _itemDiscoveryService = new ItemDiscoveryService();
             _playerDeathService = new PlayerDeathService();
+            _buffService = new BuffService();
         }
 
         public async Task<List<string>> Tick(int playerId)
@@ -39,7 +41,11 @@ namespace digsite.GameServices
             }
             var messageLists = new List<List<string>>()
             {
-                ActivateItems(gameState)
+                HandleBuffs(gameState)
+                , HandlePlayerDeath(gameState)
+                , HandleMonsterDeaths(gameState)
+                , ActivateItems(gameState)
+                , HandlePlayerDeath(gameState)
                 , HandleMonsterDeaths(gameState)
                 , MonsterAttacks(gameState)
                 , HandlePlayerDeath(gameState)
@@ -49,6 +55,13 @@ namespace digsite.GameServices
             };
             await _gameStateDataService.SaveGameState(gameState);
             return messageLists.SelectMany(m => m).Where(m => !string.IsNullOrEmpty(m)).ToList();
+        }
+
+        private List<string> HandleBuffs(GameState gameState)
+        {
+            var messages1 = _buffService.HandlePlayerBuffs(gameState);
+            var messages2 = _buffService.HandleMonsterBuffs(gameState);
+            return messages1.Concat(messages2).ToList();
         }
 
         private List<string> ActivateItems(GameState gameState)

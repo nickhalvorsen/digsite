@@ -22,6 +22,8 @@ namespace digsite.DataServices
                         .ThenInclude(i => i.ItemSlot)
                     .Include(gs => gs.Player.DigState.NearbyMonster)
                         .ThenInclude(nm => nm.Monster)
+                    .Include(gs => gs.Player.DigState.NearbyMonster)
+                        .ThenInclude(nm => nm.NearbyMonsterBuff)
                     .SingleAsync(gs => gs.PlayerId == playerId);
             }
         }
@@ -49,6 +51,8 @@ namespace digsite.DataServices
             RemoveDeletedPlayerItems(context, gameState, currentPlayerItemIds);
             RemoveDeletedNearbyMonsters(context, gameState);
             RemoveDeletedDigState(context, gameState);
+            RemoveDeletedPlayerBuffs(context, gameState);
+            RemoveDeletedNearbyMonsterBuffs(context, gameState);
         }
 
         private void RemoveDeletedPlayerItems(DigsiteContext context, GameState gameState, List<int> currentPlayerItemIds)
@@ -79,5 +83,16 @@ namespace digsite.DataServices
                 context.DigState.Remove(contextDigState);
             }
         }
+
+        private void RemoveDeletedPlayerBuffs(DigsiteContext context, GameState gameState)
+        {
+
+        }
+
+        private void RemoveDeletedNearbyMonsterBuffs(DigsiteContext context, GameState gameState)
+        {
+
+        }
+
     }
 }
