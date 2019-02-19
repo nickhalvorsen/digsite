@@ -6,7 +6,7 @@
 
 <style>
 
-  @font-face {
+  @@font-face {
         font-family: "B612Mono";
         src: url("webfonts/B612Mono-Regular.ttf");
     }
@@ -19,12 +19,30 @@
 
     body {
         background: url('img/bkg1.png');
+        padding-top:0;
+
+
+         text-shadow:
+       2px 2px 0 rgba(30, 30, 30, .3),
+     -1px -1px 0 rgba(30, 30, 30, 1),  
+      1px -1px 0 rgba(30, 30, 30, 1),
+      -1px 1px 0 rgba(30, 30, 30, 1),
+       1px 1px 0 rgba(30, 30, 30, 1);
+    }
+
+    .game-title {
+         text-shadow:
+       2px 2px 0 #222,
+     -1px -1px 0 #222,  
+      1px -1px 0 #222,
+      -1px 1px 0 #222,
+       1px 1px 0 #222;
     }
 
     .monsters 
     , .items
     , .item-upgrader{
-        border: 1px solid black;
+        border: 1px solid white;
         padding: 1em;
         margin: 1em;
     }
@@ -41,7 +59,8 @@
     }
 
     .item.non-clickable:hover {
-        background: #EEE;
+        color: rgba(140, 140, 140, 1);
+        background: rgba(66, 66, 66, .6);
     }
 
     .item.selected {
@@ -58,32 +77,30 @@
         background: white;
         border: 1px solid black;
         padding: .5em;
+        text-shadow: none;
     }
     
     .item {
         cursor: default;
     }
 
+    .infopanel-large {
+        font-size: 1.5em;
+    }
+
 
 </style>
 
 <div id="app">
+    <h1 class="game-title">digsite</h1>
     <div v-if="!gameState.isLoaded" class="loading">
         Loading...
     </div>
     <div v-if="gameState.isLoaded">
         <div>
             <div class="panel3">
-                game log:
-                <textarea rows="20" cols="50" readonly class="messages">
-                    {{ uiState.logMessages }}
-                </textarea>
 
-                <div>
-                    money: {{ playerState.money }}
-                </div>
-
-                <div>
+                <div class="infopanel-large">
                     digging: {{ digState.hasDigState && !digState.isPaused }}
                     <div v-if="digState.hasDigState">
                         <div>
@@ -93,6 +110,14 @@
                         fuel: {{ digState.fuel }}
                     </div>
                 </div>
+                <br>
+
+
+                game log:
+                <textarea rows="20" cols="50" readonly class="messages">
+                    {{ uiState.logMessages }}
+                </textarea>
+
 
                 <button v-if="!digState.hasDigState || digState.isPaused" v-on:click="startDigging">start dig</button>
                 <button v-if="digState.hasDigState && !digState.isPaused" v-on:click="stopDigging">stop dig</button>
