@@ -28,10 +28,12 @@ namespace digsite.DataServices
 
         public async Task SaveGameState(GameState gameState)
         {
+            var currentPlayerItemIds = gameState.Player.PlayerItem.Select(pi => pi.PlayerItemId).ToList();
+
             using (var context = new DigsiteContext())
             {
                 context.Attach(gameState);
-                RemoveDeleted(context, gameState);
+                RemoveDeleted(context, gameState, currentPlayerItemIds);
                 IEnumerable<EntityEntry> unchangedEntities = context.ChangeTracker.Entries().Where(x => x.State == EntityState.Unchanged);
 
                 foreach(EntityEntry ee in unchangedEntities){
@@ -42,23 +44,23 @@ namespace digsite.DataServices
             }
         }
 
-        private void RemoveDeleted(DigsiteContext context, GameState gameState)
+        private void RemoveDeleted(DigsiteContext context, GameState gameState, List<int> currentPlayerItemIds)
         {
-            RemoveDeletedPlayerItems(context, gameState);
+            RemoveDeletedPlayerItems(context, gameState, currentPlayerItemIds);
             RemoveDeletedNearbyMonsters(context, gameState);
             RemoveDeletedDigState(context, gameState);
         }
 
-        private void RemoveDeletedPlayerItems(DigsiteContext context, GameState gameState)
+        private void RemoveDeletedPlayerItems(DigsiteContext context, GameState gameState, List<int> currentPlayerItemIds)
         {
-            var existingItems = context.PlayerItem.Where(pi => pi.PlayerId == gameState.PlayerId);
-            var itemsToDelete = existingItems.Where(ei => !gameState.Player.PlayerItem.Any(pi => pi.PlayerItemId == ei.PlayerItemId));
+            var existingItems = context.PlayerItem.Where(pi => pi.PlayerId == gameState.PlayerId).ToList();
+            var itemsToDelete = existingItems.Where(ei => !currentPlayerItemIds.Any(pi => pi == ei.PlayerItemId)).ToList();
             context.PlayerItem.RemoveRange(itemsToDelete);
         }
 
         private void RemoveDeletedNearbyMonsters(DigsiteContext context, GameState gameState)
         {
-            if (gameState.Player.DigState == null) 
+            if (gameState.Player.DigState == null)  
             {
                 return;
             }

@@ -13,6 +13,7 @@ namespace digsite.GameServices
             }
 
             new DiggingService().ReturnToSurface(gameState);
+            new DigTimerService().Stop(gameState.PlayerId);
 
             return new List<string>() { "Oh no, you got KOed!" };
         }

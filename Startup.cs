@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using digsite.Hubs;
 using digsite.GameServices.PlayerManager;
+using digsite.GameServices;
 
 namespace digsite
 {
@@ -69,6 +70,13 @@ namespace digsite
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            StartupGameLogic();
+        }
+
+        private void StartupGameLogic()
+        {
+            new AllPlayersManager().PauseAllDigging();
         }
     }
 }

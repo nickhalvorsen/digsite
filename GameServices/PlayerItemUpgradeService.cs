@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using digsite.Data;
 
@@ -6,13 +7,13 @@ namespace digsite.GameServices
 {
     public class PlayerItemUpgradeService
     {
-        public void UpgradeItem(GameState gameState, int playerItemId1, int playerItemId2)
+        public List<string> UpgradeItem(GameState gameState, int playerItemId1, int playerItemId2)
         {
             var playerItem1 = gameState.Player.PlayerItem.FirstOrDefault(pi => pi.PlayerItemId == playerItemId1);
             var playerItem2 = gameState.Player.PlayerItem.FirstOrDefault(pi => pi.PlayerItemId == playerItemId2);
             if (playerItem1 == null || playerItem2 == null)
             {
-                return;
+                return new List<string>();
             }
 
             PlayerItem itemToUpgrade;
@@ -39,6 +40,8 @@ namespace digsite.GameServices
             {
                 itemToUpgrade.UpgradeLevel--;
             }
+
+            return new List<string>();
         }
 
         private void CombineItems(GameState gameState, PlayerItem itemToUpgrade, PlayerItem itemToConsume)
@@ -54,7 +57,7 @@ namespace digsite.GameServices
 
         private bool WasUpgradeSuccessful()
         {
-            return new Random().Next(1, 2) == 1;
+            return new Random().Next(0, 2) == 1;
         }
     }
 }

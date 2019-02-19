@@ -46,6 +46,11 @@ namespace digsite.GameServices
 
         public List<string> Progress(GameState gameState)
         {
+            if (gameState.Player.DigState == null)
+            {
+                return new List<string>();
+            }
+
             gameState.Player.DigState.Depth++;
             gameState.Player.DigState.Fuel--;
             return new List<string>();

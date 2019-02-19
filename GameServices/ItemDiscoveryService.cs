@@ -29,8 +29,8 @@ namespace digsite.GameServices
                 , new DropTableItem((int)ItemId.AmuletOfBurning, 40)
                 , new DropTableItem((int)ItemId.AmuletOfFoulOdor, 40)
             };
-            return new DropTable(items);
 
+            return new DropTable(items);
         }
 
         private IEnumerable<Item> GetFoundItems(List<int> itemIds)
@@ -66,6 +66,7 @@ namespace digsite.GameServices
                 CurrentCooldown = 0,
                 IsEquipped = 0,
                 ItemId = item.ItemId,
+                UpgradeLevel = 1
             };
         }
     }

@@ -10,7 +10,6 @@ Vue.component('digsite-item', {
   },
   methods: {
     showTooltip: function(event) {
-
         if (this.item.description === "" || this.item.description === undefined)
         {
             return
@@ -31,8 +30,10 @@ Vue.component('digsite-item', {
         <span v-if="item.currentCooldown > 0">
             <i class="fa fa-clock"/> {{ item.currentCooldown }}
         </span>
+        <span v-if="item.upgradeLevel > 1">(V{{ item.upgradeLevel }})</span>
         <div v-if="tooltipShowing" :style="{ position:'fixed', left: tooltipX, top: tooltipY }" class="item-description-tooltip">
-          <span v-if="item.slotName != 'None'">({{ item.slotName }})</span> {{ item.description }}
+          <span v-if="item.slotName != 'None'">({{ item.slotName }})</span> 
+          {{ item.description }} 
         </div>
     </span>
     `

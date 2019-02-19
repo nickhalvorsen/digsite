@@ -60,12 +60,12 @@ namespace digsite.GameServices
 
         private bool ShouldActivateItem(PlayerItem playerItem)
         {
-            return playerItem.CurrentCooldown == 0 && playerItem.IsEquipped == (byte)1;
+            return playerItem.CurrentCooldown <= 0 && playerItem.IsEquipped == (byte)1;
         }
 
         private string ActivateItem(GameState gameState, PlayerItem item)
         {
-            item.CurrentCooldown = item.Item.Cooldown;
+            SetItemsOnCooldown(gameState, item);
             switch (item.ItemId)
             {
                 case (int)ItemId.AmuletOfBurning:
@@ -75,6 +75,14 @@ namespace digsite.GameServices
             }
 
             return $"{item.Item.Name} activated.";
+        }
+
+        private void SetItemsOnCooldown(GameState gameState, PlayerItem playerItem)
+        {
+            gameState.Player.PlayerItem
+                .Where(pi => pi.ItemId == playerItem.ItemId)
+                .ToList()
+                .ForEach(pi => pi.CurrentCooldown = pi.Item.Cooldown);
         }
 
         private string AmuletOfBurningActivate(GameState gameState)

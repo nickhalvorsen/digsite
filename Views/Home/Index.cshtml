@@ -5,8 +5,14 @@
 </head>
 
 <style>
+
+    body {
+        background: #b39c71;
+    }
+
     .monsters 
-    , .items{
+    , .items
+    , .item-upgrader{
         border: 1px solid black;
         padding: 1em;
         margin: 1em;
@@ -18,13 +24,17 @@
         width: 400px;
     }
 
-    .item.equippable:hover {
+    .item.clickable:hover {
         color: white;
         background: black;
     }
 
-    .item.non-equippable:hover {
+    .item.non-clickable:hover {
         background: #EEE;
+    }
+
+    .item.selected {
+        background: lightblue;
     }
 
     .itemPendingServerUpdate { 
@@ -43,6 +53,7 @@
         cursor: default;
     }
 
+
 </style>
 
 <div id="app">
@@ -50,77 +61,73 @@
         Loading...
     </div>
     <div v-if="gameState.isLoaded">
-        <div class="panel3">
-            game log:
-            <textarea rows="20" cols="50" readonly class="messages">
-                {{ uiState.logMessages }}
-            </textarea>
+        <div>
+            <div class="panel3">
+                game log:
+                <textarea rows="20" cols="50" readonly class="messages">
+                    {{ uiState.logMessages }}
+                </textarea>
 
-            <div>
-                money: {{ playerState.money }}
+                <div>
+                    money: {{ playerState.money }}
+                </div>
+
+                <div>
+                    digging: {{ digState.hasDigState && !digState.isPaused }}
+                    <div v-if="digState.hasDigState">
+                        <div>
+
+                        depth: {{ digState.depth }}
+                            </div>
+                        fuel: {{ digState.fuel }}
+                    </div>
+                </div>
+
+                <button v-if="!digState.hasDigState || digState.isPaused" v-on:click="startDigging">start dig</button>
+                <button v-if="digState.hasDigState && !digState.isPaused" v-on:click="stopDigging">stop dig</button>
+                <button v-if="digState.hasDigState" v-on:click="returnToSurface">return to surface</button>
             </div>
-
-            <div>
-                digging: {{ digState.hasDigState && !digState.isPaused }}
-                <div v-if="digState.hasDigState">
-                    <div>
-
-                    depth: {{ digState.depth }}
+            <div class="panel3">
+                <div class="monsters">
+                    <h3>Nearby monsters</h3>
+                    <br>
+                    <div v-for="monster in digState.nearbyMonsters">
+                        {{ monster.name }} ({{ monster.currentHealth }} / {{ monster.maxHealth }})
+                    </div>
+                </div>
+            </div>
+            <div class="panel3">
+                <div class="items">
+                    <h3>Items</h3>
+                    <br>
+                    <hr/>
+                    <b>Equipped:</b>
+                    <br>
+                    <div v-for="playerItem in itemState" v-if="playerItem.isEquipped">
+                        <div v-bind:class="getBackpackItemCssClass(playerItem)" v-on:click="backpackItemClicked(playerItem)">
+                            <digsite-item :item="playerItem"/>
                         </div>
-                    fuel: {{ digState.fuel }}
-                </div>
-            </div>
+                    </div>
+                    <hr/>
 
-            <button v-if="!digState.hasDigState || digState.isPaused" v-on:click="startDigging">start dig</button>
-            <button v-if="digState.hasDigState && !digState.isPaused" v-on:click="stopDigging">stop dig</button>
-            <button v-if="digState.hasDigState" v-on:click="returnToSurface">return to surface</button>
-        </div>
-        <div class="panel3">
-            <div class="monsters">
-                <h3>Nearby monsters</h3>
-                <br>
-                <div v-for="monster in digState.nearbyMonsters">
-                    {{ monster.name }} ({{ monster.currentHealth }} / {{ monster.maxHealth }})
-                </div>
-            </div>
-        </div>
-        <div class="panel3">
-            <div class="items">
-                <h3>Items</h3>
-                <br>
-                <hr/>
-                <b>Equipped:</b>
-                <br>
-                <div v-for="playerItem in itemState" v-if="playerItem.isEquipped">
-                    <div v-if="playerItem.isPendingServerUpdate" class="item itemPendingServerUpdate">
-                        <digsite-item :item="playerItem"/>
-                    </div>
-                    <div v-if="!playerItem.IsPendingServerUpdate && playerItem.itemSlotId <= 1" class="item non-equippable">
-                        <digsite-item :item="playerItem"/>
-                    </div>
-                    <div v-if="!playerItem.isPendingServerUpdate && playerItem.itemSlotId > 1" v-on:click="unequipItem(playerItem.playerItemId)" class="item equippable">
-                        <digsite-item :item="playerItem"/>
-                    </div>
-                </div>
-                <hr/>
-
-                <div v-for="playerItem in itemState" v-if="!playerItem.isEquipped">
-                    <div v-if="playerItem.isPendingServerUpdate" class="item itemPendingServerUpdate">
-                        <digsite-item :item="playerItem"/>
-                    </div>
-                    <div v-if="!playerItem.IsPendingServerUpdate && playerItem.itemSlotId <= 1" class="item non-equippable">
-                        <digsite-item :item="playerItem"/>
-                    </div>
-                    <div v-if="!playerItem.isPendingServerUpdate && playerItem.itemSlotId > 1" v-on:click="equipItem(playerItem.playerItemId)" class="item equippable">
-                        <digsite-item :item="playerItem"/>
+                    <div v-for="playerItem in itemState" v-if="!playerItem.isEquipped">
+                        <div v-bind:class="getBackpackItemCssClass(playerItem)" v-on:click="backpackItemClicked(playerItem)">
+                            <digsite-item :item="playerItem"/>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <br/>
-
-        <digsite-item-upgrader :items="itemState"/>
+        <br>
+        <div style="clear:both;"/>
+<br>
+<br>
+        <div>
+            <div class="panel3">
+                <digsite-item-upgrader :items="itemState" :player-id="gameState.playerId"/>
+            </div>
+        </div>
+        </div>
 
     </div>
 </div>
@@ -128,4 +135,5 @@
 <script src="~/lib/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/vue.js"></script>
 <script src="~/js/vue-item.js"></script>
+<script src="~/js/vue-item-upgrader.js"></script>
 <script src="~/js/vue-app.js"></script>

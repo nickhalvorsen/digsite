@@ -119,6 +119,7 @@ namespace digsite.GameServices.PlayerManager
             return new PlayerItemDto
             {
                 playerItemId = playerItem.PlayerItemId
+                , itemId = playerItem.ItemId
                 , name = playerItem.Item.Name
                 , itemCategoryId = playerItem.Item.ItemCategoryId
                 , isEquipped = playerItem.IsEquipped != 0
@@ -126,6 +127,7 @@ namespace digsite.GameServices.PlayerManager
                 , slotName = playerItem.Item.ItemSlot.Description
                 , currentCooldown = playerItem.CurrentCooldown
                 , description = playerItem.Item.Description
+                , upgradeLevel = playerItem.UpgradeLevel
             };
         }
 
@@ -180,7 +182,7 @@ namespace digsite.GameServices.PlayerManager
         public async Task UpgradeItem(int playerId, int playerItemId1, int playerItemId2)
         {
             var gameState = await _gameStateDataService.GetGameState(playerId);
-            var message = _itemUpgradeService.UpgradeItem(playerItemId1, playerItemId2); 
+            var message = _playerItemUpgradeService.UpgradeItem(gameState, playerItemId1, playerItemId2); 
             await _gameStateDataService.SaveGameState(gameState);
             await GameUpdateData(gameState, message);
         }

@@ -46,7 +46,6 @@ namespace digsite.GameServices
                 , ProgressDigging(gameState)
                 , FindItems(gameState)
                 , MonsterApproach(gameState)
-                , new List<string>() { "You dig a little deeper." }
             };
             await _gameStateDataService.SaveGameState(gameState);
             return messageLists.SelectMany(m => m).Where(m => !string.IsNullOrEmpty(m)).ToList();
