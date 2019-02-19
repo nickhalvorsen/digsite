@@ -1,0 +1,7 @@
+make a 16x16 image
+fill it with random noise, randomization 100%
+modify the contrast -90
+greyscale
+make a new layer on top, fill it with solid color
+make the new layer mode Hard Light
+up the image size to 32x32, no interpolation
