@@ -108,7 +108,7 @@ namespace digsite.GameServices.PlayerManager
             {
                 hasDigState = true
                 , depth = digState.Depth
-                , fuel = digState.Fuel
+                , fuel = (int)digState.Fuel
                 , isPaused = digState.IsPaused > 0 ? true : false
                 , nearbyMonsters = GetNearbyMonstersDto(digState.NearbyMonster.ToList())
             };

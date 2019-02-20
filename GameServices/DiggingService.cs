@@ -52,7 +52,7 @@ namespace digsite.GameServices
             }
 
             gameState.Player.DigState.Depth++;
-            gameState.Player.DigState.Fuel--;
+            gameState.Player.DigState.Fuel -= .2m;
             return new List<string>();
         }
 

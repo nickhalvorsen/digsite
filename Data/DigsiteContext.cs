@@ -59,7 +59,7 @@ namespace digsite.Data
 
                 entity.Property(e => e.Depth).HasColumnType("int(11)");
 
-                entity.Property(e => e.Fuel).HasColumnType("int(11)");
+                entity.Property(e => e.Fuel).HasColumnType("decimal(10,2)");
 
                 entity.Property(e => e.IsPaused).HasColumnType("tinyint(1)");
 
