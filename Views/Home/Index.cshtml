@@ -13,12 +13,13 @@
 
     #app {
         font-family: "B612Mono";
-        font-size: 12px;
+        font-size: 13px;
         color: #FDFDFD;
     }
 
     body {
-        background: url('img/bkg1.png');
+        background: url('img/bkg2.png');
+        background-size:64px;
         padding-top:0;
 
 
@@ -42,7 +43,7 @@
     .monsters 
     , .items
     , .item-upgrader{
-        border: 1px solid white;
+        background: rgba(22, 22, 22, .4);
         padding: 1em;
         margin: 1em;
     }
@@ -85,7 +86,7 @@
     }
 
     .infopanel-large {
-        font-size: 1.5em;
+        font-size: 2em;
     }
 
 
@@ -101,10 +102,9 @@
             <div class="panel3">
 
                 <div class="infopanel-large">
-                    digging: {{ digState.hasDigState && !digState.isPaused }}
+                    <!--digging: {{ digState.hasDigState && !digState.isPaused }}-->
                     <div v-if="digState.hasDigState">
                         <div>
-
                         depth: {{ digState.depth }}
                             </div>
                         fuel: {{ digState.fuel }}
